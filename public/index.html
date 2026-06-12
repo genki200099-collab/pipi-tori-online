@@ -5,15 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>ピピとりオンライン</title>
   <style>
-:root{--bg:#fff6e8;--ink:#3b2118;--red:#b64040;--pink:#ffd6d6;--gold:#d4a536;--line:#efc5a5;--shadow:0 8px 24px rgba(66,36,20,.14)}
-*{box-sizing:border-box}body{margin:0;background:linear-gradient(#fffaf0,#ffeeda);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",Meiryo,sans-serif;color:var(--ink)}
-#app{max-width:980px;margin:0 auto;padding:12px 12px 80px}.hero{background:#fff;border:3px solid var(--line);border-radius:22px;padding:14px 16px;box-shadow:var(--shadow);position:sticky;top:0;z-index:10}.hero h1{font-size:clamp(23px,5vw,38px);margin:0;color:var(--red)}.hero p{margin:4px 0 0;color:#895142;font-weight:800}.cardbox{margin-top:12px;background:white;border:3px solid var(--line);border-radius:22px;padding:14px;box-shadow:var(--shadow)}
-.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.row>*{flex:1}.btn{border:none;border-radius:999px;background:linear-gradient(135deg,var(--red),#8c2525);color:white;font-weight:900;padding:12px 16px;box-shadow:0 4px 0 #6e1f1f;cursor:pointer}.btn.secondary{background:#fff4df;color:#7b332e;border:2px solid #e5b98d;box-shadow:none}.btn:disabled{opacity:.45;cursor:not-allowed}.input{border:2px solid #e4b09b;border-radius:14px;padding:12px;font-size:16px;min-width:0}.roomcode{font-size:42px;letter-spacing:.18em;font-weight:900;color:var(--red);text-align:center;background:#fff6e8;border:2px dashed #e4b09b;border-radius:18px;padding:12px;margin:8px 0}.small{font-size:12px;color:#80635a}.players{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.player{background:#fffaf2;border:2px solid #efd0b4;border-radius:16px;padding:10px;text-align:center;position:relative}.player.active{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,165,54,.25)}.player .pig{font-size:28px}.player .name{font-weight:900}.pill{display:inline-block;background:#fff1da;border-radius:999px;padding:4px 8px;margin:4px 2px;font-size:12px}.status{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.status div{background:#fffaf2;border:2px solid #efd0b4;border-radius:16px;text-align:center;padding:8px}.status b{display:block;font-size:20px;color:var(--red)}.table{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;background:radial-gradient(circle,#fff8e8,#ffe8d8);border:2px dashed #efb3a4;border-radius:18px;padding:10px;min-height:128px}.slot{border:2px dashed #e4b09b;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:110px}.who{font-size:12px;font-weight:900;color:#8c503e}.hand{display:flex;gap:8px;overflow-x:auto;padding:10px 2px;min-height:136px}.playing-card{width:72px;min-width:72px;height:110px;border-radius:10px;border:2px solid #6a3a2f;background:#fff;display:flex;flex-direction:column;justify-content:space-between;padding:6px;box-shadow:0 4px 10px rgba(0,0,0,.16);position:relative;user-select:none}.playing-card.playable{cursor:pointer;transform:translateY(-5px);border-color:var(--gold);box-shadow:0 8px 14px rgba(180,115,40,.28)}.playing-card.unplayable{opacity:.45;filter:grayscale(.25)}.rank{font-weight:900;font-size:20px}.suit{font-size:22px}.art{text-align:center;font-size:30px}.back{background:linear-gradient(135deg,#f6a3a3,#d94d5f);border-color:#9a2b38;color:#fff;align-items:center;justify-content:center;text-align:center}.back:before{content:'🐷';font-size:34px}.joker{background:linear-gradient(135deg,#fff,#e9ddff);border-color:#4d2c72}.spades{color:#222}.clubs{color:#218042}.hearts,.diamonds{color:#c92929}.message{margin-top:8px;background:#fff3c9;border-left:6px solid var(--gold);padding:10px;border-radius:12px;font-weight:900}.log{max-height:220px;overflow:auto;font-size:13px;line-height:1.55;background:#fffaf2;border-radius:12px;padding:8px}.log p{margin:0 0 6px;padding-bottom:6px;border-bottom:1px dashed #edd0b8}.pick{background:linear-gradient(135deg,#fff,#ffe4e4);border:3px solid #e9a1a1;border-radius:22px;padding:12px}.pick h2{color:var(--red);margin:0 0 8px}.pick-row{display:flex;gap:8px;overflow-x:auto;padding:10px 0}.pick-btn{border:none;background:transparent;padding:0}.pick-btn:disabled{opacity:.7}.pick .flow{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center}.pick .person{background:#fff7ed;border:2px solid #f1c7a8;border-radius:16px;padding:10px;text-align:center;font-weight:900}.arrow{font-size:28px;color:var(--red);font-weight:900}.score{width:100%;border-collapse:collapse;font-size:14px}.score th,.score td{border:1px solid #e0b99c;padding:7px;text-align:center}.score th{background:#ffe9d6}@media(max-width:650px){#app{padding:8px 8px 70px}.players,.status,.table{grid-template-columns:repeat(2,1fr)}.row>*{flex-basis:100%}.playing-card{width:62px;min-width:62px;height:96px}.art{font-size:24px}.pick .flow{grid-template-columns:1fr}.arrow{text-align:center;transform:rotate(90deg)}}
+:root{--bg:#fff6e8;--ink:#3b2118;--red:#b64040;--pink:#ffd6d6;--gold:#d4a536;--line:#efc5a5;--green:#2e8c58;--blue:#4776b8;--shadow:0 8px 24px rgba(66,36,20,.14)}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% 0,#fffaf0,#ffeeda 55%,#ffd9cf);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",Meiryo,sans-serif;color:var(--ink)}
+#app{max-width:980px;margin:0 auto;padding:12px 12px 90px}.hero{background:linear-gradient(135deg,#fff,#fff7e6);border:3px solid var(--line);border-radius:22px;padding:14px 16px;box-shadow:var(--shadow);position:sticky;top:0;z-index:10}.hero h1{font-size:clamp(23px,5vw,38px);margin:0;color:var(--red);letter-spacing:.02em}.hero p{margin:4px 0 0;color:#895142;font-weight:800}.cardbox{margin-top:12px;background:rgba(255,255,255,.96);border:3px solid var(--line);border-radius:22px;padding:14px;box-shadow:var(--shadow)}
+h2{margin:0 0 10px}.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.row>*{flex:1}.btn{border:none;border-radius:999px;background:linear-gradient(135deg,var(--red),#8c2525);color:white;font-weight:900;padding:12px 16px;box-shadow:0 4px 0 #6e1f1f;cursor:pointer}.btn.secondary{background:#fff4df;color:#7b332e;border:2px solid #e5b98d;box-shadow:none}.btn:disabled{opacity:.45;cursor:not-allowed}.input{border:2px solid #e4b09b;border-radius:14px;padding:12px;font-size:16px;min-width:0}.roomcode{font-size:42px;letter-spacing:.18em;font-weight:900;color:var(--red);text-align:center;background:#fff6e8;border:2px dashed #e4b09b;border-radius:18px;padding:12px;margin:8px 0}.small{font-size:12px;color:#80635a}.players{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.player{background:#fffaf2;border:2px solid #efd0b4;border-radius:16px;padding:10px;text-align:center;position:relative;min-height:126px;overflow:visible}.player.active{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,165,54,.25),0 0 18px rgba(212,165,54,.25)}.player .pig{font-size:32px}.player .name{font-weight:900}.pill{display:inline-block;background:#fff1da;border-radius:999px;padding:4px 8px;margin:4px 2px;font-size:12px}.cpu-badge{display:inline-block;background:#e9f4ff;color:#24598e;border-radius:999px;padding:2px 7px;margin-left:3px;font-size:11px;font-weight:900}.talk{margin-top:6px;background:#fff;border:2px solid #f2c3c3;border-radius:14px;padding:7px;font-size:12px;font-weight:900;color:#82302d;position:relative;animation:pop .28s ease-out}.talk:before{content:'';position:absolute;top:-8px;left:50%;border:8px solid transparent;border-bottom-color:#f2c3c3;transform:translateX(-50%)}@keyframes pop{from{transform:scale(.88);opacity:.1}to{transform:scale(1);opacity:1}}
+.status{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.status div{background:#fffaf2;border:2px solid #efd0b4;border-radius:16px;text-align:center;padding:8px}.status b{display:block;font-size:20px;color:var(--red)}.commentary{background:linear-gradient(135deg,#fff7da,#ffe6ed);border-color:#f1b7a5}.comment-list{display:grid;gap:8px}.comment{display:flex;gap:8px;align-items:flex-start;background:#fff;border:2px solid #efc7b6;border-radius:16px;padding:9px}.comment .face{font-size:24px}.comment b{color:var(--red)}
+.table-wrap{position:relative}.table{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;background:radial-gradient(circle,#fff8e8,#ffe8d8);border:2px dashed #efb3a4;border-radius:18px;padding:10px;min-height:138px}.slot{border:2px dashed #e4b09b;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:116px;background:rgba(255,255,255,.55);transition:.2s}.slot.win{border-color:var(--gold);background:#fff7d7;box-shadow:0 0 0 3px rgba(212,165,54,.25)}.slot.weak{border-color:#8752b3;background:#f5edff;box-shadow:0 0 0 3px rgba(120,80,170,.18)}.result-banner{margin-bottom:10px;background:#fff;border:2px solid #e9aa84;border-radius:16px;padding:10px;font-weight:900;display:grid;grid-template-columns:1fr 1fr;gap:8px}.result-banner span{display:block;background:#fff7ed;border-radius:12px;padding:8px}.who{font-size:12px;font-weight:900;color:#8c503e}.hand{display:flex;gap:8px;overflow-x:auto;padding:14px 2px 10px;min-height:142px}.playing-card{width:72px;min-width:72px;height:110px;border-radius:10px;border:2px solid #6a3a2f;background:#fff;display:flex;flex-direction:column;justify-content:space-between;padding:6px;box-shadow:0 4px 10px rgba(0,0,0,.16);position:relative;user-select:none}.playing-card.playable{cursor:pointer;transform:translateY(-8px);border-color:var(--gold);box-shadow:0 8px 16px rgba(180,115,40,.35)}.playing-card.playable:after{content:'出せる';position:absolute;top:-12px;left:50%;transform:translateX(-50%);font-size:10px;background:var(--gold);color:white;border-radius:999px;padding:2px 6px;font-weight:900}.un .playing-card,.playing-card.unplayable{opacity:.45;filter:grayscale(.25)}.rank{font-weight:900;font-size:20px}.suit{font-size:22px}.art{text-align:center;font-size:30px}.back{background:linear-gradient(135deg,#f6a3a3,#d94d5f);border-color:#9a2b38;color:#fff;align-items:center;justify-content:center;text-align:center}.back:before{content:'🐷';font-size:34px}.joker{background:linear-gradient(135deg,#fff,#e9ddff);border-color:#4d2c72}.spades{color:#222}.clubs{color:#218042}.hearts,.diamonds{color:#c92929}.message{margin-top:8px;background:#fff3c9;border-left:6px solid var(--gold);padding:10px;border-radius:12px;font-weight:900}.log{max-height:220px;overflow:auto;font-size:13px;line-height:1.55;background:#fffaf2;border-radius:12px;padding:8px}.log p{margin:0 0 6px;padding-bottom:6px;border-bottom:1px dashed #edd0b8}.log p:first-child{background:#fff3c9;border-radius:10px;padding:7px}.pick{background:linear-gradient(135deg,#fff,#ffe4e4);border:3px solid #e9a1a1;border-radius:22px;padding:12px;animation:glow 1.4s ease-in-out infinite alternate}.pick h2{color:var(--red);margin:0 0 8px}@keyframes glow{from{box-shadow:0 8px 22px rgba(182,64,64,.16)}to{box-shadow:0 8px 30px rgba(182,64,64,.36)}}.pick-row{display:flex;gap:8px;overflow-x:auto;padding:10px 0}.pick-btn{border:none;background:transparent;padding:0}.pick-btn:disabled{opacity:.7}.pick-btn:not(:disabled) .back{animation:shake 1.2s infinite}@keyframes shake{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}.pick .flow{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center}.pick .person{background:#fff7ed;border:2px solid #f1c7a8;border-radius:16px;padding:10px;text-align:center;font-weight:900}.arrow{font-size:28px;color:var(--red);font-weight:900}.drawn{display:flex;justify-content:center;margin-top:10px;transform:scale(1.15)}.score{width:100%;border-collapse:collapse;font-size:14px}.score th,.score td{border:1px solid #e0b99c;padding:7px;text-align:center}.score th{background:#ffe9d6}.tip{background:#f8fff2;border:2px solid #bedba3;border-radius:14px;padding:8px;margin-top:8px;font-size:13px;font-weight:800;color:#44622d}
+@media(max-width:650px){#app{padding:8px 8px 80px}.players,.status,.table{grid-template-columns:repeat(2,1fr)}.row>*{flex-basis:100%}.playing-card{width:62px;min-width:62px;height:96px}.art{font-size:24px}.pick .flow,.result-banner{grid-template-columns:1fr}.arrow{text-align:center;transform:rotate(90deg)}.player{min-height:118px}.hero{position:static}}
   </style>
 </head>
 <body>
 <div id="app">
-  <header class="hero"><h1>🐷 ピピとりオンライン</h1><p>ピッグ・ピック・トリック｜部屋コードで4人対戦</p></header>
+  <header class="hero"><h1>🐷 ピピとりオンライン</h1><p>ピッグ・ピック・トリック｜CPUもしゃべる盛り上げ版</p></header>
 
   <section id="lobby" class="cardbox">
     <h2>オンライン部屋</h2>
@@ -25,10 +28,11 @@
       <input id="code" class="input" placeholder="部屋コード 例：ABCD" maxlength="4" />
       <button id="join" class="btn secondary">参加する</button>
     </div>
-    <p class="small">同じURLを友達に送り、部屋コードを入力してもらいます。4人そろったらホストが開始。</p>
+    <p class="small">同じURLを友達に送り、部屋コードを入力してもらいます。人が足りない場合はホストがCPUを追加できます。</p>
     <div id="roomInfo" style="display:none">
       <div class="roomcode" id="roomCode">----</div>
-      <button id="start" class="btn" disabled>4人そろったら開始</button>
+      <div class="row" style="margin-top:8px"><button id="addCpu" class="btn secondary">CPUを追加</button><button id="removeCpu" class="btn secondary">CPUを外す</button></div>
+      <button id="start" class="btn" disabled>4人で開始</button>
     </div>
   </section>
 
@@ -36,9 +40,11 @@
     <div class="status"><div>状態<b id="phase">未接続</b></div><div>ラウンド<b id="round">-</b></div><div>手番<b id="turn">-</b></div><div>リード<b id="lead">-</b></div></div>
   </section>
 
+  <section id="commentaryBox" class="cardbox commentary" style="display:none"><h2>🐽 CPU実況</h2><div id="commentary" class="comment-list"></div></section>
+
   <section class="cardbox"><h2>プレイヤー</h2><div id="players" class="players"></div></section>
 
-  <section class="cardbox"><h2>場のカード</h2><div id="table" class="table"></div><div id="message" class="message">部屋を作るか、部屋コードで参加してください。</div></section>
+  <section class="cardbox"><h2>場のカード</h2><div id="lastTrick"></div><div id="table" class="table"></div><div id="message" class="message">部屋を作るか、部屋コードで参加してください。</div><div class="tip">出せるカードは手札の上に少し浮きます。ピック中は中央にババ抜き画面が出ます。</div></section>
 
   <section id="pickBox" class="cardbox pick" style="display:none"></section>
 
@@ -53,10 +59,13 @@
 let ws, state=null, myId=null;
 const suitsClass={'♠':'spades','♥':'hearts','♦':'diamonds','♣':'clubs'};
 const art={'♥':'🐷💗','♦':'🐷🍎','♣':'🐷🌽','♠':'🐷🌙'};
+const faces=['🐷','🐽','🐖','🐗'];
 const $=id=>document.getElementById(id);
 $('create').onclick=()=>connect(()=>send({type:'create', name:$('name').value}));
 $('join').onclick=()=>connect(()=>send({type:'join', name:$('name').value, code:$('code').value}));
 $('start').onclick=()=>send({type:'start'});
+$('addCpu').onclick=()=>send({type:'addCpu'});
+$('removeCpu').onclick=()=>send({type:'removeCpu'});
 function connect(after){
   if(ws && ws.readyState===1){ after(); return; }
   const proto = location.protocol==='https:'?'wss':'ws';
@@ -69,6 +78,7 @@ function send(obj){ if(ws && ws.readyState===1) ws.send(JSON.stringify(obj)); }
 function me(){ return state?.players.find(p=>p.id===state.you); }
 function isHost(){ return state && state.you===state.hostId; }
 function playerName(i){ return state?.players[i]?.name || '-'; }
+function face(i){ return faces[i]||'🐷'; }
 function render(){
   if(!state) return;
   $('roomInfo').style.display='block'; $('roomCode').textContent=state.code;
@@ -76,14 +86,32 @@ function render(){
   $('round').textContent=state.round||'-'; $('turn').textContent=state.current!=null?playerName(state.current):'-'; $('lead').textContent=state.lead!=null?playerName(state.lead):'-';
   $('message').textContent=state.message||'';
   $('start').disabled = !(isHost() && state.phase==='lobby' && state.players.length===4);
-  renderPlayers(); renderTable(); renderHand(); renderPick(); renderLog(); renderScore();
+  $('addCpu').disabled = !(isHost() && state.phase==='lobby' && state.players.length<4);
+  $('removeCpu').disabled = !(isHost() && state.phase==='lobby' && state.players.some(p=>p.cpu));
+  renderCommentary(); renderPlayers(); renderLastTrick(); renderTable(); renderHand(); renderPick(); renderLog(); renderScore();
+}
+function renderCommentary(){
+  const box=$('commentaryBox'), el=$('commentary');
+  const list=(state.commentary||[]).slice(0,3);
+  if(!list.length){ box.style.display='none'; el.innerHTML=''; return; }
+  box.style.display='block';
+  el.innerHTML=list.map(c=>`<div class="comment"><div class="face">${face(c.pid)}</div><div><b>${esc(c.name)}</b><br>「${esc(c.text)}」</div></div>`).join('');
 }
 function renderPlayers(){
-  $('players').innerHTML = state.players.map((p,i)=>`<div class="player ${state.current===i?'active':''}"><div class="pig">${['🐷','🐽','🐖','🐗'][i]||'🐷'}</div><div class="name">${esc(p.name)} ${p.id===state.you?'（あなた）':''}</div><span class="pill">手札 ${p.handCount}</span><span class="pill">ごちそう ${p.scorePileCount}</span><span class="pill">ペア ${p.pairsCount}</span><div class="small">${p.connected?'接続中':'切断'}</div></div>`).join('');
+  $('players').innerHTML = state.players.map((p,i)=>`<div class="player ${state.current===i?'active':''}"><div class="pig">${face(i)}</div><div class="name">${esc(p.name)} ${p.id===state.you?'（あなた）':p.cpu?'<span class="cpu-badge">CPU</span>':''}</div><span class="pill">手札 ${p.handCount}</span><span class="pill">ごちそう ${p.scorePileCount}</span><span class="pill">ペア ${p.pairsCount}</span><div class="small">${p.cpu?'自動プレイ':(p.connected?'接続中':'切断')}</div>${p.lastComment?`<div class="talk">${esc(p.lastComment)}</div>`:''}</div>`).join('');
+}
+function renderLastTrick(){
+  const lt=state.lastTrick;
+  $('lastTrick').innerHTML = lt ? `<div class="result-banner"><span>👑 勝者：${esc(lt.winnerName)}<br><small>${esc(lt.winnerCard)}でごちそう山ゲット</small></span><span>💀 最弱：${esc(lt.weakestName)}<br><small>${esc(lt.weakestCard)}で袋を狙われる！</small></span></div>` : '';
 }
 function renderTable(){
   const slots=[];
-  for(let i=0;i<4;i++){ const x=state.trick.find(t=>t.pid===i); slots.push(`<div class="slot"><div class="who">${esc(playerName(i))}</div>${x?cardHTML(x.card):'<span class="small">未プレイ</span>'}</div>`); }
+  const lt=state.lastTrick;
+  for(let i=0;i<4;i++){
+    const x=state.trick.find(t=>t.pid===i);
+    const cls = lt && lt.winnerPid===i ? ' win' : lt && lt.weakestPid===i ? ' weak' : '';
+    slots.push(`<div class="slot${cls}"><div class="who">${esc(playerName(i))}</div>${x?cardHTML(x.card):'<span class="small">未プレイ</span>'}</div>`);
+  }
   $('table').innerHTML=slots.join('');
 }
 function playable(card){
@@ -107,14 +135,14 @@ function renderPick(){
   box.style.display='block';
   const w=state.players[pp.winnerPid], l=state.players[pp.weakestPid];
   const now=Date.now(), ready=now>=pp.readyAt;
-  let html=`<h2>🐽 ババ抜きピック</h2><div class="flow"><div class="person">勝者<br>${esc(w.name)}</div><div class="arrow">→</div><div class="person">最弱<br>${esc(l.name)}</div></div>`;
-  if(pp.result){ html += `<div class="message">${esc(pp.result.text)}</div>${cardHTML(pp.result.drawn,true)}`; }
+  let html=`<h2>🐽 ババ抜きピック中！</h2><div class="flow"><div class="person">👑 勝者<br>${esc(w.name)}</div><div class="arrow">→</div><div class="person">💀 最弱<br>${esc(l.name)}</div></div>`;
+  if(pp.result){ html += `<div class="message">${esc(pp.result.text)}</div><div class="drawn">${cardHTML(pp.result.drawn,true)}</div>`; }
   else if(state.yourIndex===pp.winnerPid){
-    html += `<div class="message">${ready?'最弱の袋から1枚選んでください。':'確認中…もう少しでカードを選べます。'}</div><div class="pick-row">`;
+    html += `<div class="message">${ready?'最弱の袋から1枚タップしてピック！':'確認中…これから相手の袋から1枚選びます。'}</div><div class="pick-row">`;
     for(let i=0;i<l.handCount;i++) html += `<button class="pick-btn" ${ready?'':'disabled'} onclick="pick(${i})"><div class="playing-card back"></div></button>`;
     html += `</div>`;
   } else {
-    html += `<div class="message">${ready?`${esc(w.name)} がカードを選ぶのを待っています。`:`確認中… ${esc(w.name)} が ${esc(l.name)} から1枚ピックします。`}</div><div class="pick-row">`;
+    html += `<div class="message">${ready?`${esc(w.name)} がカードを選んでいます。`:`確認中… ${esc(w.name)} が ${esc(l.name)} から1枚ピックします。`}</div><div class="pick-row">`;
     for(let i=0;i<l.handCount;i++) html += `<div class="playing-card back"></div>`;
     html += `</div>`;
   }
@@ -126,7 +154,7 @@ function renderScore(){
   $('scoreBox').style.display='block';
   const rows=state.players.map(p=>`<tr><td>${esc(p.name)}</td><td>${p.final.pile}</td><td>-${p.final.normalHand*3}</td><td>-${p.final.madPig*13}</td><td>-${p.final.joker*20}</td><td><b>${p.final.total}</b></td></tr>`).join('');
   const win=[...state.players].sort((a,b)=>b.final.total-a.final.total)[0];
-  $('score').innerHTML=`<div class="message">勝者：${esc(win.name)}！</div><table class="score"><tr><th>名前</th><th>得点パイル</th><th>残り手札</th><th>マッド・ピッグ</th><th>ババブタ</th><th>合計</th></tr>${rows}</table>`;
+  $('score').innerHTML=`<div class="message">🏆 勝者：${esc(win.name)}！</div><table class="score"><tr><th>名前</th><th>得点パイル</th><th>残り手札</th><th>マッド・ピッグ</th><th>ババブタ</th><th>合計</th></tr>${rows}</table>`;
 }
 function cardHTML(c, playable=false){
   if(!c) return '';

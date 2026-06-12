@@ -53,6 +53,49 @@ function sortHand(h){
   });
 }
 function log(room, text){ room.log.unshift({time:new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit',second:'2-digit'}), text}); room.log = room.log.slice(0,80); }
+function say(room, pid, text){
+  const p = room.players[pid]; if(!p) return;
+  const item = {pid, name:p.name, text, expiresAt: Date.now()+8500};
+  p.lastComment = item;
+  room.commentary = room.commentary || [];
+  room.commentary.unshift(item);
+  room.commentary = room.commentary.slice(0,8);
+  log(room, `💬 ${p.name}「${text}」`);
+}
+function sample(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+function cpuPlayLine(room, pid, card){
+  const p = room.players[pid];
+  const hand = p.hand;
+  const leadSuit = room.leadSuit;
+  const jokerInHand = hand.some(c=>c.joker);
+  if(!leadSuit){
+    if(hand.length <= 3) return sample(['ここで上がりに近づくブヒ！','ごちそう山、いただきに行くブヒ！','ラストスパート、強めにいくブヒ！']);
+    if(card.val >= 12) return sample(['最初から圧をかけるブヒ！','高めで様子を見るブヒ。','これで主導権を取りたいブヒ！']);
+    return sample(['まずは様子見でいくブヒ。','小さく入って様子を見るブヒ。','ここは安全運転ブヒ。']);
+  }
+  const hasLeadBefore = [...hand, card].some(c=>!c.joker && c.suit===leadSuit);
+  if(card.suit !== leadSuit){
+    if(jokerInHand) return sample(['スートがない！ババブタを隠して逃げるブヒ…','ここは別スートでかわすブヒ。ババブタだけは出せない！','よし、フォロー不能。いらないカードで逃げるブヒ。']);
+    return sample(['そのスート持ってないブヒ！','自由に出せるならこれでいくブヒ。','うわっ、きついな〜。別スートで逃げるブヒ。']);
+  }
+  const currentHigh = room.trick.filter(x=>x.card.suit===leadSuit).reduce((m,x)=>Math.max(m,x.card.val),0);
+  if(card.val > currentHigh && card.val >= 10) return sample(['まさか、ここで勝ちに行くブヒ！','ここでそれを出すブヒ！ごちそう狙い！','勝てるなら勝つしかないブヒ！']);
+  if(card.val <= 5) return sample(['低めで耐えるブヒ…','うわっ、弱いのしかないブヒ。','これで最弱にならないといいブヒ…']);
+  return sample(['マストフォロー、了解ブヒ。','このカードでついていくブヒ。','まだ勝負は分からないブヒ。']);
+}
+function cpuPickLine(room, winnerPid, weakestPid){
+  const wp=room.players[winnerPid], lp=room.players[weakestPid];
+  if(wp.cpu) return sample([`さて、${lp.name}の袋をのぞくブヒ…`,`そこにババブタいないでほしいブヒ…`,`勝ったのに怖い時間ブヒ。どれにするブヒ？`]);
+  const cpu = room.players.find((p,i)=>p.cpu && i!==winnerPid);
+  if(cpu){ const idx = room.players.indexOf(cpu); say(room, idx, sample(['このピック、空気が重いブヒ…','そこ引くの！？いや、まだ分からないブヒ！','ババブタの気配がするブヒ…'])); }
+  return null;
+}
+function resultLine(drawn, paired){
+  if(drawn.joker) return sample(['うわー！ババブタ来たブヒ！！','最悪の1枚を引いたブヒ…！','これはきついブヒ、完全に事故ブヒ！']);
+  if(paired) return sample(['おそろいペア！これはうまいブヒ！','ナイス浄化ブヒ！手札が軽くなった！','そのペアは気持ちいいブヒ〜！']);
+  if(drawn.val >= 11) return sample(['強いカードを拾ったブヒ。これは得かも？','高いカード、あとで効きそうブヒ。']);
+  return sample(['まあまあの1枚ブヒ。','とりあえず手札に入れておくブヒ。','微妙だけどババブタじゃないだけセーフブヒ。']);
+}
 function publicState(room, viewerId){
   const viewerIndex = room.players.findIndex(p=>p.id===viewerId);
   return {
@@ -75,25 +118,31 @@ function publicState(room, viewerId){
       result: room.pendingPick.result || null
     } : null,
     players: room.players.map((p,i)=>({
-      id:p.id, name:p.name, seat:i, connected:p.ws && p.ws.readyState===WebSocket.OPEN,
+      id:p.id, name:p.name, seat:i, cpu: !!p.cpu, connected: p.cpu || (p.ws && p.ws.readyState===WebSocket.OPEN),
       handCount:p.hand.length,
       hand: p.id===viewerId || room.phase==='finished' ? p.hand : null,
       scorePileCount:p.scorePile.length,
       pairsCount:p.pairs.length,
       out:p.out || false,
       final:p.final || null,
+      lastComment: p.lastComment && p.lastComment.expiresAt > Date.now() ? p.lastComment.text : null,
     })),
+    commentary: (room.commentary || []).filter(x=>x.expiresAt > Date.now()).slice(0,4),
+    lastTrick: room.lastTrick && room.lastTrick.expiresAt > Date.now() ? room.lastTrick : null,
     log: room.log,
   };
 }
 function send(ws, type, payload){ if(ws.readyState===WebSocket.OPEN) ws.send(JSON.stringify({type, ...payload})); }
-function broadcast(room){ for(const p of room.players) if(p.ws) send(p.ws,'state',{state: publicState(room,p.id)}); }
+function broadcast(room){
+  for(const p of room.players) if(p.ws) send(p.ws,'state',{state: publicState(room,p.id)});
+  scheduleCpu(room);
+}
 function roomByWs(ws){ return rooms.get(ws.roomCode); }
 function createRoom(ws, name){
   const c = code();
   const id = uid();
-  const room = {code:c, hostId:id, players:[], phase:'lobby', round:1, lead:0, current:0, leadSuit:null, trick:[], stock:[], log:[], message:'4人そろったら開始できます。', pendingPick:null};
-  const player = {id, name: cleanName(name), ws, hand:[], scorePile:[], pairs:[], out:false};
+  const room = {code:c, hostId:id, players:[], phase:'lobby', round:1, lead:0, current:0, leadSuit:null, trick:[], stock:[], log:[], message:'4人そろったら開始できます。人が足りない場合はCPUを追加できます。', pendingPick:null, commentary:[], lastTrick:null};
+  const player = {id, name: cleanName(name), ws, cpu:false, hand:[], scorePile:[], pairs:[], out:false};
   room.players.push(player); rooms.set(c, room); ws.roomCode=c; ws.playerId=id;
   log(room, `${player.name} が部屋を作りました。`); send(ws,'created',{code:c, playerId:id}); broadcast(room);
 }
@@ -103,13 +152,85 @@ function joinRoom(ws, c, name){
   if(!room) return send(ws,'errorMsg',{message:'部屋が見つかりません。'});
   if(room.phase !== 'lobby') return send(ws,'errorMsg',{message:'この部屋はすでに開始済みです。'});
   if(room.players.length >= 4) return send(ws,'errorMsg',{message:'この部屋は満員です。'});
-  const id = uid(); const player = {id, name:cleanName(name), ws, hand:[], scorePile:[], pairs:[], out:false};
+  const id = uid(); const player = {id, name:cleanName(name), ws, cpu:false, hand:[], scorePile:[], pairs:[], out:false};
   room.players.push(player); ws.roomCode=c; ws.playerId=id;
   log(room, `${player.name} が参加しました。`); send(ws,'joined',{code:c, playerId:id}); broadcast(room);
 }
+
+function addCpu(room, requesterId){
+  if(room.hostId !== requesterId) return;
+  if(room.phase !== 'lobby') return;
+  if(room.players.length >= 4) { room.message='この部屋は満員です。'; broadcast(room); return; }
+  const cpuNames = ['CPUブタA','CPUブタB','CPUブタC','CPUブタD'];
+  const used = new Set(room.players.map(p=>p.name));
+  const name = cpuNames.find(n=>!used.has(n)) || `CPUブタ${room.players.length}`;
+  const player = {id:`CPU-${uid()}`, name, ws:null, cpu:true, hand:[], scorePile:[], pairs:[], out:false};
+  room.players.push(player);
+  log(room, `${player.name} を追加しました。`);
+  room.message='CPUを追加しました。4人そろったら開始できます。';
+  broadcast(room);
+}
+function removeCpu(room, requesterId){
+  if(room.hostId !== requesterId) return;
+  if(room.phase !== 'lobby') return;
+  const i = room.players.map(p=>p.cpu).lastIndexOf(true);
+  if(i<0) { room.message='削除できるCPUがいません。'; broadcast(room); return; }
+  const [p] = room.players.splice(i,1);
+  log(room, `${p.name} を外しました。`);
+  room.message='CPUを外しました。';
+  broadcast(room);
+}
+function isCpuTurn(room){ return room.phase==='playing' && room.current!=null && room.players[room.current]?.cpu && !room.pendingPick; }
+function chooseCpuCard(room, pid){
+  const allowed = [...playableIds(room, pid)];
+  const hand = room.players[pid].hand;
+  const cards = allowed.map(id=>hand.find(c=>c.id===id)).filter(Boolean);
+  if(!cards.length) return null;
+  cards.sort((a,b)=>a.val-b.val || suits.indexOf(a.suit)-suits.indexOf(b.suit));
+  if(!room.leadSuit){
+    if(hand.filter(c=>!c.joker).length <= 3) return cards[cards.length-1];
+    return cards[0];
+  }
+  const leadPlays = room.trick.filter(x=>x.card.suit===room.leadSuit);
+  const high = leadPlays.reduce((m,x)=>Math.max(m,x.card.val),0);
+  const follow = cards.filter(c=>c.suit===room.leadSuit);
+  if(follow.length){
+    const winners = follow.filter(c=>c.val > high).sort((a,b)=>a.val-b.val);
+    // 手札が少ない時や安く勝てる時は取りにいく。そうでなければ低く逃げる。
+    if(winners.length && (hand.length <= 5 || winners[0].val <= high+2 || Math.random()<0.35)) return winners[0];
+    return follow.sort((a,b)=>a.val-b.val)[0];
+  }
+  // フォロー不能なら、低い通常カードを捨てる。ババブタは出せない。
+  return cards[0];
+}
+function scheduleCpu(room){
+  if(room.cpuTimer) return;
+  if(room.phase !== 'playing') return;
+  const pp = room.pendingPick;
+  if(pp && room.players[pp.winnerPid]?.cpu && !pp.result){
+    const delay = Math.max(500, pp.readyAt - Date.now() + 350);
+    room.cpuTimer = setTimeout(()=>{ room.cpuTimer=null; doCpuPick(room); }, delay);
+    return;
+  }
+  if(isCpuTurn(room)){
+    room.cpuTimer = setTimeout(()=>{ room.cpuTimer=null; doCpuPlay(room); }, 900);
+  }
+}
+function doCpuPlay(room){
+  if(!isCpuTurn(room)) return;
+  const pid = room.current;
+  const card = chooseCpuCard(room, pid);
+  if(card){ say(room, pid, cpuPlayLine(room, pid, card)); playCard(room, room.players[pid].id, card.id); }
+}
+function doCpuPick(room){
+  const pp = room.pendingPick;
+  if(!pp || pp.result || !room.players[pp.winnerPid]?.cpu) return;
+  doPick(room, room.players[pp.winnerPid].id, Math.floor(Math.random() * Math.max(1, room.players[pp.weakestPid].hand.length)));
+}
+
 function startGame(room, requesterId){
   if(room.hostId !== requesterId) return;
-  if(room.players.length !== 4) { room.message='4人そろうと開始できます。'; broadcast(room); return; }
+  if(room.players.length !== 4) { room.message='4人そろうと開始できます。足りない席はCPUを追加してください。'; broadcast(room); return; }
   room.phase='playing'; room.round=1; room.lead=Math.floor(Math.random()*4); room.current=room.lead; room.trick=[]; room.leadSuit=null; room.pendingPick=null; room.stock=[];
   for(const p of room.players){ p.hand=[]; p.scorePile=[]; p.pairs=[]; p.out=false; p.final=null; }
   dealInitial(room);
@@ -154,6 +275,9 @@ function resolveTrick(room){
   let weakest = room.trick[0];
   for(const x of room.trick){ if(x.card.val < weakest.card.val) weakest=x; else if(x.card.val===weakest.card.val && x.order > weakest.order) weakest=x; }
   const wp = room.players[winner.pid], lp = room.players[weakest.pid];
+  room.lastTrick = {winnerPid:winner.pid, weakestPid:weakest.pid, winnerName:wp.name, weakestName:lp.name, winnerCard:cardText(winner.card), weakestCard:cardText(weakest.card), expiresAt:Date.now()+8500};
+  if(wp.cpu) say(room, winner.pid, sample(['よし、ごちそう山ゲットだブヒ！','勝ったけど、このあとが怖いブヒ…','取った！でもピックが本番ブヒ。']));
+  if(lp.cpu && lp.hand.length>0) say(room, weakest.pid, sample(['えっ、最弱！？やめてブヒ〜！','うわっ、きついな〜。袋を見ないでブヒ！','最弱になったブヒ…嫌な予感しかしないブヒ。']));
   wp.scorePile.push(...room.trick.map(x=>x.card));
   log(room, `👑 ${wp.name} が勝利。場の4枚をごちそう山へ。`);
   log(room, `💀 最弱は ${lp.name}（${cardText(weakest.card)}）。`);
@@ -161,6 +285,7 @@ function resolveTrick(room){
     const readyAt = Date.now() + 1800;
     room.pendingPick = {winnerPid:winner.pid, weakestPid:weakest.pid, readyAt, result:null};
     room.message = `🐽 ババ抜きピック！ ${wp.name} が ${lp.name} の袋から1枚選びます。`;
+    const line = cpuPickLine(room, winner.pid, weakest.pid); if(line) say(room, winner.pid, line);
     setTimeout(()=>broadcast(room), 1850);
   } else finishAfterPick(room, winner.pid);
 }
@@ -182,6 +307,8 @@ function doPick(room, playerId, targetIndex){
   const resultText = drawn.joker ? `${wp.name} はババブタを引いた！` : paired ? `${wp.name} は ${drawn.rank} のおそろいペアを浄化！` : `${wp.name} は ${cardText(drawn)} を手札に加えた。`;
   pp.result = {drawn, paired: !!paired, text: resultText};
   log(room, `🐽 ${resultText}`);
+  if(wp.cpu) say(room, pp.winnerPid, resultLine(drawn, !!paired));
+  else { const cpu = room.players.find((p,i)=>p.cpu && i!==pp.winnerPid); if(cpu){ const ci=room.players.indexOf(cpu); say(room, ci, resultLine(drawn, !!paired)); } }
   room.message = resultText;
   broadcast(room);
   setTimeout(()=>{ if(room.pendingPick===pp) finishAfterPick(room, pp.winnerPid); }, 2600);
@@ -203,9 +330,10 @@ function checkRoundEnd(room){
     let refill = makeDeck().filter(c=>!c.joker); shuffle(refill);
     for(const p of room.players){ while(p.hand.length<13){ p.hand.push((room.stock.length?room.stock:refill).pop()); } sortHand(p.hand); }
     room.message=`${out.name} が上がり！第2ラウンドへ。残り手札を持ち越して13枚まで補充しました。`;
+    if(out.cpu) say(room, outPid, sample(['上がりブヒ！後半もこの調子でいくブヒ！','まずは抜けたブヒ！でも後半があるブヒ。']));
     log(room, room.message);
   } else {
-    room.phase='finished'; room.message=`${out.name} が上がり！ゲーム終了。`; log(room, room.message); score(room);
+    room.phase='finished'; room.message=`${out.name} が上がり！ゲーム終了。`; if(out.cpu) say(room, outPid, sample(['上がり！ごちそう山を数えるブヒ！','決着ブヒ！点数計算だブヒ！'])); log(room, room.message); score(room);
   }
   return true;
 }
@@ -227,6 +355,8 @@ wss.on('connection', (ws) => {
     if(msg.type==='join') return joinRoom(ws, msg.code, msg.name);
     const room = roomByWs(ws); if(!room) return;
     if(msg.type==='start') startGame(room, ws.playerId);
+    if(msg.type==='addCpu') addCpu(room, ws.playerId);
+    if(msg.type==='removeCpu') removeCpu(room, ws.playerId);
     if(msg.type==='play') playCard(room, ws.playerId, msg.cardId);
     if(msg.type==='pick') doPick(room, ws.playerId, Number(msg.index));
   });
