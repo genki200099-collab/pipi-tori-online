@@ -26,6 +26,14 @@ const server = http.createServer((req, res) => {
 const wss = new WebSocket.Server({ server });
 const rooms = new Map();
 
+// 進行停止監視。タイマーが不発になった場合でも、待機状態を定期的に拾って進める。
+setInterval(()=>{
+  for(const room of rooms.values()){
+    try { ensureRoomProgress(room); } catch(e) { console.error('progress watchdog error', e); }
+  }
+}, 1000);
+
+
 const suits = ['♠','♥','♦','♣'];
 const ranks = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
 const value = Object.fromEntries(ranks.map((r,i)=>[r,i+2]));
@@ -137,7 +145,6 @@ function send(ws, type, payload){ if(ws.readyState===WebSocket.OPEN) ws.send(JSO
 function broadcast(room){
   for(const p of room.players) if(p.ws) send(p.ws,'state',{state: publicState(room,p.id)});
   scheduleCpu(room);
-  ensureRoomProgress(room);
 }
 function roomByWs(ws){ return rooms.get(ws.roomCode); }
 function createRoom(ws, name){
@@ -203,6 +210,10 @@ function clearReviewTimer(room){
     clearTimeout(room.reviewFailSafeTimer);
     room.reviewFailSafeTimer = null;
   }
+  if(room.reviewWatchTimer){
+    clearInterval(room.reviewWatchTimer);
+    room.reviewWatchTimer = null;
+  }
 }
 function clearAllProgressTimers(room){
   clearReviewTimer(room);
@@ -232,31 +243,59 @@ function ensurePickFinish(room, pp, winnerPid, delay=2600){
   }, delay + 4500);
 }
 function ensureReviewToPick(room, reviewToken, winnerPid, weakestPid){
+  // レビュー→ピック遷移は、この関数で必ず予約する。
+  // 既存タイマーが残っていても一旦消し、reviewTokenで現在のレビューだけを進める。
   clearReviewTimer(room);
+
+  const delay = Math.max(0, reviewToken - Date.now());
   room.reviewTimer = setTimeout(()=>{
     room.reviewTimer = null;
     advanceReviewToPick(room, reviewToken, winnerPid, weakestPid);
-  }, 5000);
+  }, delay);
 
-  // レビュー画面で止まる事故を防ぐ保険。
+  // 保険1：通常タイマーが実行されなかった場合でも進める。
   room.reviewFailSafeTimer = setTimeout(()=>{
     if(room.phase !== 'playing') return;
     if(!room.trickReview || room.trickReview.until !== reviewToken) return;
-    log(room, '⚠️ トリック結果確認からの進行が遅延したため、自動復旧しました。');
+    log(room, '⚠️ トリック結果確認からピックへの遷移が遅延したため、自動復旧しました。');
     advanceReviewToPick(room, reviewToken, winnerPid, weakestPid);
-  }, 8000);
+  }, delay + 3500);
+
+  // 保険2：Renderなどでタイマーが遅延しても、短い監視でレビュー期限切れを拾う。
+  if(room.reviewWatchTimer) clearInterval(room.reviewWatchTimer);
+  room.reviewWatchTimer = setInterval(()=>{
+    if(room.phase !== 'playing' || !room.trickReview || room.trickReview.until !== reviewToken){
+      clearInterval(room.reviewWatchTimer); room.reviewWatchTimer=null; return;
+    }
+    if(Date.now() >= reviewToken){
+      clearInterval(room.reviewWatchTimer); room.reviewWatchTimer=null;
+      advanceReviewToPick(room, reviewToken, winnerPid, weakestPid);
+    }
+  }, 500);
 }
+
 function advanceReviewToPick(room, reviewToken, winnerPid, weakestPid){
   if(room.phase !== 'playing') return;
+
+  // 現在のレビューと違う古いタイマーなら無視。
   if(!room.trickReview || room.trickReview.until !== reviewToken) return;
-  clearReviewTimer(room);
-  room.trickReview = null;
 
   const wp = room.players[winnerPid];
   const lp = room.players[weakestPid];
-  if(!wp || !lp) return;
+  if(!wp || !lp){
+    log(room, '⚠️ ピック遷移対象のプレイヤーが見つからないため、進行を復旧しました。');
+    room.trickReview = null;
+    room.trick = [];
+    room.leadSuit = null;
+    room.current = room.lead ?? 0;
+    broadcast(room);
+    return;
+  }
 
-  if(lp.hand.length>0){
+  clearReviewTimer(room);
+  room.trickReview = null;
+
+  if(lp.hand.length > 0){
     const readyAt = Date.now() + 1800;
     room.pendingPick = {
       winnerPid,
@@ -274,8 +313,17 @@ function advanceReviewToPick(room, reviewToken, winnerPid, weakestPid){
     finishAfterPick(room, winnerPid);
   }
 }
+
 function ensureRoomProgress(room){
   if(!room || room.phase !== 'playing') return;
+
+  // 4枚出揃っているのにレビューにもピックにも進んでいない場合は、トリック解決をやり直す。
+  if(!room.pendingPick && !room.trickReview && room.trick && room.trick.length===4){
+    log(room, '⚠️ トリック解決待ちで停止を検知したため、自動復旧しました。');
+    resolveTrick(room);
+    broadcast(room);
+    return;
+  }
 
   // 通常進行中なのにcurrentがnullで、レビュー・ピック待ちでもない場合はリードへ復旧。
   if(room.current == null && !room.pendingPick && !room.trickReview){
@@ -310,9 +358,17 @@ function ensureRoomProgress(room){
     return;
   }
 
-  // レビュー画面で止まっている場合は再予約。
-  if(room.trickReview && room.trickReview.until <= Date.now()){
-    advanceReviewToPick(room, room.trickReview.until, room.trickReview.winnerPid, room.trickReview.weakestPid);
+  // レビュー画面で止まっている/タイマーが外れている場合は復旧。
+  if(room.trickReview){
+    if(room.trickReview.until <= Date.now()){
+      advanceReviewToPick(room, room.trickReview.until, room.trickReview.winnerPid, room.trickReview.weakestPid);
+      return;
+    }
+    if(!room.reviewTimer && !room.reviewWatchTimer){
+      log(room, '⚠️ トリック確認タイマーが外れていたため、再予約しました。');
+      ensureReviewToPick(room, room.trickReview.until, room.trickReview.winnerPid, room.trickReview.weakestPid);
+      return;
+    }
   }
 }
 
@@ -508,6 +564,7 @@ function doPick(room, playerId, targetIndex){
   ensurePickFinish(room, pp, pp.winnerPid, 2600);
 }
 function finishAfterPick(room, winnerPid){
+  clearReviewTimer(room);
   clearPickFinishTimer(room);
   clearCpuPickTimer(room);
   if(room.cpuPickFailSafeTimer){ clearTimeout(room.cpuPickFailSafeTimer); room.cpuPickFailSafeTimer=null; }
