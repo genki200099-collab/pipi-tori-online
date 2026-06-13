@@ -8,10 +8,61 @@
 :root{--bg:#fff6e8;--ink:#3b2118;--red:#b64040;--pink:#ffd6d6;--gold:#d4a536;--line:#efc5a5;--green:#2e8c58;--blue:#4776b8;--shadow:0 8px 24px rgba(66,36,20,.14)}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% 0,#fffaf0,#ffeeda 55%,#ffd9cf);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",Meiryo,sans-serif;color:var(--ink)}
 #app{max-width:980px;margin:0 auto;padding:12px 12px 90px}.hero{background:linear-gradient(135deg,#fff,#fff7e6);border:3px solid var(--line);border-radius:22px;padding:14px 16px;box-shadow:var(--shadow);position:sticky;top:0;z-index:10}.hero h1{font-size:clamp(23px,5vw,38px);margin:0;color:var(--red);letter-spacing:.02em}.hero p{margin:4px 0 0;color:#895142;font-weight:800}.cardbox{margin-top:12px;background:rgba(255,255,255,.96);border:3px solid var(--line);border-radius:22px;padding:14px;box-shadow:var(--shadow)}
-h2{margin:0 0 10px}.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.row>*{flex:1}.btn{border:none;border-radius:999px;background:linear-gradient(135deg,var(--red),#8c2525);color:white;font-weight:900;padding:12px 16px;box-shadow:0 4px 0 #6e1f1f;cursor:pointer}.btn.secondary{background:#fff4df;color:#7b332e;border:2px solid #e5b98d;box-shadow:none}.btn:disabled{opacity:.45;cursor:not-allowed}.input{border:2px solid #e4b09b;border-radius:14px;padding:12px;font-size:16px;min-width:0}.roomcode{font-size:42px;letter-spacing:.18em;font-weight:900;color:var(--red);text-align:center;background:#fff6e8;border:2px dashed #e4b09b;border-radius:18px;padding:12px;margin:8px 0}.small{font-size:12px;color:#80635a}.players{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.player{background:#fffaf2;border:2px solid #efd0b4;border-radius:16px;padding:10px;text-align:center;position:relative;min-height:126px;overflow:visible}.player.active{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,165,54,.25),0 0 18px rgba(212,165,54,.25)}.player .pig{font-size:32px}.player .name{font-weight:900}.pill{display:inline-block;background:#fff1da;border-radius:999px;padding:4px 8px;margin:4px 2px;font-size:12px}.cpu-badge{display:inline-block;background:#e9f4ff;color:#24598e;border-radius:999px;padding:2px 7px;margin-left:3px;font-size:11px;font-weight:900}.talk{margin-top:6px;background:#fff;border:2px solid #f2c3c3;border-radius:14px;padding:7px;font-size:12px;font-weight:900;color:#82302d;position:relative;animation:pop .28s ease-out}.talk:before{content:'';position:absolute;top:-8px;left:50%;border:8px solid transparent;border-bottom-color:#f2c3c3;transform:translateX(-50%)}@keyframes pop{from{transform:scale(.88);opacity:.1}to{transform:scale(1);opacity:1}}
+h2{margin:0 0 10px}.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.row>*{flex:1}.btn{border:none;border-radius:999px;background:linear-gradient(135deg,var(--red),#8c2525);color:white;font-weight:900;padding:12px 16px;box-shadow:0 4px 0 #6e1f1f;cursor:pointer}.btn.secondary{background:#fff4df;color:#7b332e;border:2px solid #e5b98d;box-shadow:none}.btn:disabled{opacity:.45;cursor:not-allowed}.input{border:2px solid #e4b09b;border-radius:14px;padding:12px;font-size:16px;min-width:0}.roomcode{font-size:42px;letter-spacing:.18em;font-weight:900;color:var(--red);text-align:center;background:#fff6e8;border:2px dashed #e4b09b;border-radius:18px;padding:12px;margin:8px 0}.small{font-size:12px;color:#80635a}.players{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.player{background:#fffaf2;border:2px solid #efd0b4;border-radius:16px;padding:10px;text-align:center;position:relative;min-height:126px;overflow:visible}.player.active{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,165,54,.25),0 0 18px rgba(212,165,54,.25)}.player .pig{font-size:32px}.player .name{font-weight:900}.seat-chip{display:inline-block;background:#fff7da;color:#7a4c0c;border:2px solid #efce89;border-radius:999px;padding:2px 8px;margin:4px 0 2px;font-size:11px;font-weight:900}.pill{display:inline-block;background:#fff1da;border-radius:999px;padding:4px 8px;margin:4px 2px;font-size:12px}.cpu-badge{display:inline-block;background:#e9f4ff;color:#24598e;border-radius:999px;padding:2px 7px;margin-left:3px;font-size:11px;font-weight:900}.talk{margin-top:6px;background:#fff;border:2px solid #f2c3c3;border-radius:14px;padding:7px;font-size:12px;font-weight:900;color:#82302d;position:relative;animation:pop .28s ease-out}.talk:before{content:'';position:absolute;top:-8px;left:50%;border:8px solid transparent;border-bottom-color:#f2c3c3;transform:translateX(-50%)}@keyframes pop{from{transform:scale(.88);opacity:.1}to{transform:scale(1);opacity:1}}
 .status{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.status div{background:#fffaf2;border:2px solid #efd0b4;border-radius:16px;text-align:center;padding:8px}.status b{display:block;font-size:20px;color:var(--red)}.commentary{background:linear-gradient(135deg,#fff7da,#ffe6ed);border-color:#f1b7a5}.comment-list{display:grid;gap:8px}.comment{display:flex;gap:8px;align-items:flex-start;background:#fff;border:2px solid #efc7b6;border-radius:16px;padding:9px}.comment .face{font-size:24px}.comment b{color:var(--red)}
-.table-wrap{position:relative}.table{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;background:radial-gradient(circle,#fff8e8,#ffe8d8);border:2px dashed #efb3a4;border-radius:18px;padding:10px;min-height:138px}.slot{border:2px dashed #e4b09b;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:116px;background:rgba(255,255,255,.55);transition:.2s}.slot.win{border-color:var(--gold);background:#fff7d7;box-shadow:0 0 0 3px rgba(212,165,54,.25)}.slot.weak{border-color:#8752b3;background:#f5edff;box-shadow:0 0 0 3px rgba(120,80,170,.18)}.result-banner{margin-bottom:10px;background:#fff;border:2px solid #e9aa84;border-radius:16px;padding:10px;font-weight:900;display:grid;grid-template-columns:1fr 1fr;gap:8px}.result-banner span{display:block;background:#fff7ed;border-radius:12px;padding:8px}.who{font-size:12px;font-weight:900;color:#8c503e}.hand{display:flex;gap:8px;overflow-x:auto;padding:14px 2px 10px;min-height:142px}.playing-card{width:72px;min-width:72px;height:110px;border-radius:10px;border:2px solid #6a3a2f;background:#fff;display:flex;flex-direction:column;justify-content:space-between;padding:6px;box-shadow:0 4px 10px rgba(0,0,0,.16);position:relative;user-select:none}.playing-card.playable{cursor:pointer;transform:translateY(-8px);border-color:var(--gold);box-shadow:0 8px 16px rgba(180,115,40,.35)}.playing-card.playable:after{content:'出せる';position:absolute;top:-12px;left:50%;transform:translateX(-50%);font-size:10px;background:var(--gold);color:white;border-radius:999px;padding:2px 6px;font-weight:900}.un .playing-card,.playing-card.unplayable{opacity:.45;filter:grayscale(.25)}.rank{font-weight:900;font-size:20px}.suit{font-size:22px}.art{text-align:center;font-size:30px}.back{background:linear-gradient(135deg,#f6a3a3,#d94d5f);border-color:#9a2b38;color:#fff;align-items:center;justify-content:center;text-align:center}.back:before{content:'🐷';font-size:34px}.joker{background:linear-gradient(135deg,#fff,#e9ddff);border-color:#4d2c72}.spades{color:#222}.clubs{color:#218042}.hearts,.diamonds{color:#c92929}.message{margin-top:8px;background:#fff3c9;border-left:6px solid var(--gold);padding:10px;border-radius:12px;font-weight:900}.log{max-height:220px;overflow:auto;font-size:13px;line-height:1.55;background:#fffaf2;border-radius:12px;padding:8px}.log p{margin:0 0 6px;padding-bottom:6px;border-bottom:1px dashed #edd0b8}.log p:first-child{background:#fff3c9;border-radius:10px;padding:7px}.pick{background:linear-gradient(135deg,#fff,#ffe4e4);border:3px solid #e9a1a1;border-radius:22px;padding:12px;animation:glow 1.4s ease-in-out infinite alternate}.pick h2{color:var(--red);margin:0 0 8px}@keyframes glow{from{box-shadow:0 8px 22px rgba(182,64,64,.16)}to{box-shadow:0 8px 30px rgba(182,64,64,.36)}}.pick-row{display:flex;gap:8px;overflow-x:auto;padding:10px 0}.pick-btn{border:none;background:transparent;padding:0}.pick-btn:disabled{opacity:.7}.pick-btn:not(:disabled) .back{animation:shake 1.2s infinite}@keyframes shake{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}.pick .flow{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center}.pick .person{background:#fff7ed;border:2px solid #f1c7a8;border-radius:16px;padding:10px;text-align:center;font-weight:900}.arrow{font-size:28px;color:var(--red);font-weight:900}.drawn{display:flex;justify-content:center;margin-top:10px;transform:scale(1.15)}.score{width:100%;border-collapse:collapse;font-size:14px}.score th,.score td{border:1px solid #e0b99c;padding:7px;text-align:center}.score th{background:#ffe9d6}.tip{background:#f8fff2;border:2px solid #bedba3;border-radius:14px;padding:8px;margin-top:8px;font-size:13px;font-weight:800;color:#44622d}
-@media(max-width:650px){#app{padding:8px 8px 80px}.players,.status,.table{grid-template-columns:repeat(2,1fr)}.row>*{flex-basis:100%}.playing-card{width:62px;min-width:62px;height:96px}.art{font-size:24px}.pick .flow,.result-banner{grid-template-columns:1fr}.arrow{text-align:center;transform:rotate(90deg)}.player{min-height:118px}.hero{position:static}}
+.table-wrap{position:relative}.table{background:radial-gradient(circle,#fff8e8,#ffe8d8);border:2px dashed #efb3a4;border-radius:18px;padding:10px;min-height:138px}.turn-order-bar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;justify-content:center;margin-bottom:10px;background:#fff8ef;border:2px solid #f0cfb3;border-radius:14px;padding:8px 10px;font-weight:900}.turn-order-bar .ord{padding:6px 10px;border-radius:999px;background:#fff;border:2px solid #efceb1}.turn-order-bar .ord.current{background:#fff1cf;border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,165,54,.18)}.turn-order-bar .ord.done{background:#eef8ef;border-color:#b7d8b7}.turn-order-bar .arrowtxt{color:#aa6d5c;font-weight:900}.table-board{display:grid;grid-template-columns:1fr 124px 1fr;grid-template-areas:'p0 mid p1' 'p3 mid p2';gap:14px;align-items:stretch}.seat{border:2px dashed #e4b09b;border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:6px;min-height:180px;background:rgba(255,255,255,.55);transition:.2s;position:relative;padding:12px 10px 14px}.seat.win{border-color:var(--gold);background:#fff7d7;box-shadow:0 0 0 3px rgba(212,165,54,.25)}.seat.weak{border-color:#8752b3;background:#f5edff;box-shadow:0 0 0 3px rgba(120,80,170,.18)}.seat.current{box-shadow:0 0 0 4px rgba(212,165,54,.28),0 10px 18px rgba(212,165,54,.16)}.seat-0{grid-area:p0}.seat-1{grid-area:p1}.seat-2{grid-area:p2}.seat-3{grid-area:p3}.seat .mini-card{transform:scale(1.08);transform-origin:center top}.seat .play-badge{position:absolute;top:8px;left:8px;background:linear-gradient(135deg,#b64040,#8c2525);color:#fff;border-radius:999px;padding:2px 7px;font-size:11px;font-weight:900}.seat .turn-flag{position:absolute;top:8px;right:8px;background:#fff0bd;color:#7a4b00;border:2px solid #efcf7e;border-radius:999px;padding:2px 7px;font-size:11px;font-weight:900;animation:pulse 1s infinite alternate}.seat .seat-arrow{position:absolute;display:flex;align-items:center;gap:4px;background:#fff;border:2px solid #efceb1;border-radius:999px;padding:4px 8px;font-weight:900;color:#8c503e;box-shadow:0 3px 8px rgba(0,0,0,.08)}.seat .seat-arrow.current-next{background:#fff1cf;border-color:var(--gold);color:#7a4b00}.seat-0 .seat-arrow{right:-24px;top:50%;transform:translateY(-50%)}.seat-1 .seat-arrow{left:50%;bottom:-22px;transform:translateX(-50%)}.seat-2 .seat-arrow{left:-24px;top:50%;transform:translateY(-50%)}.seat-3 .seat-arrow{left:50%;top:-22px;transform:translateX(-50%)}.center-wheel{grid-area:mid;align-self:center;justify-self:center;width:118px;height:118px;border-radius:50%;background:linear-gradient(135deg,#fffef8,#ffeecf);border:3px solid #e9c076;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-weight:900;color:#7a4b00;box-shadow:0 10px 18px rgba(212,165,54,.18)}.center-wheel .cw-arrow{font-size:28px;line-height:1}.center-wheel .cw-small{font-size:12px;color:#8c503e}.result-banner{margin-bottom:10px;background:#fff;border:2px solid #e9aa84;border-radius:16px;padding:10px;font-weight:900;display:grid;grid-template-columns:1fr 1fr;gap:8px}.result-banner span{display:block;background:#fff7ed;border-radius:12px;padding:8px}.who{font-size:12px;font-weight:900;color:#8c503e}.hand{display:flex;gap:8px;overflow-x:auto;padding:14px 2px 10px;min-height:142px}.playing-card{width:72px;min-width:72px;height:110px;border-radius:10px;border:2px solid #6a3a2f;background:#fff;display:flex;flex-direction:column;justify-content:space-between;padding:6px;box-shadow:0 4px 10px rgba(0,0,0,.16);position:relative;user-select:none}.playing-card.playable{cursor:pointer;transform:translateY(-8px);border-color:var(--gold);box-shadow:0 8px 16px rgba(180,115,40,.35)}.playing-card.playable:after{content:'出せる';position:absolute;top:-12px;left:50%;transform:translateX(-50%);font-size:10px;background:var(--gold);color:white;border-radius:999px;padding:2px 6px;font-weight:900}.un .playing-card,.playing-card.unplayable{opacity:.45;filter:grayscale(.25)}.rank{font-weight:900;font-size:20px}.suit{font-size:22px}.art{text-align:center;font-size:30px}.back{background:linear-gradient(135deg,#f6a3a3,#d94d5f);border-color:#9a2b38;color:#fff;align-items:center;justify-content:center;text-align:center}.back:before{content:'🐷';font-size:34px}.joker{background:linear-gradient(135deg,#fff,#e9ddff);border-color:#4d2c72}.spades{color:#222}.clubs{color:#218042}.hearts,.diamonds{color:#c92929}.message{margin-top:8px;background:#fff3c9;border-left:6px solid var(--gold);padding:10px;border-radius:12px;font-weight:900}.log{max-height:220px;overflow:auto;font-size:13px;line-height:1.55;background:#fffaf2;border-radius:12px;padding:8px}.log p{margin:0 0 6px;padding-bottom:6px;border-bottom:1px dashed #edd0b8}.log p:first-child{background:#fff3c9;border-radius:10px;padding:7px}.pick{background:linear-gradient(135deg,#fff,#ffe4e4);border:3px solid #e9a1a1;border-radius:22px;padding:12px;animation:glow 1.4s ease-in-out infinite alternate}.pick h2{color:var(--red);margin:0 0 8px}@keyframes glow{from{box-shadow:0 8px 22px rgba(182,64,64,.16)}to{box-shadow:0 8px 30px rgba(182,64,64,.36)}}.pick-row{display:flex;gap:8px;overflow-x:auto;padding:10px 0}.pick-btn{border:none;background:transparent;padding:0}.pick-btn:disabled{opacity:.7}.pick-btn:not(:disabled) .back{animation:shake 1.2s infinite}@keyframes shake{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}@keyframes pulse{from{transform:scale(1)}to{transform:scale(1.06)}}.pick .flow{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center}.pick .person{background:#fff7ed;border:2px solid #f1c7a8;border-radius:16px;padding:10px;text-align:center;font-weight:900}.arrow{font-size:28px;color:var(--red);font-weight:900}.drawn{display:flex;justify-content:center;margin-top:10px;transform:scale(1.15)}.score{width:100%;border-collapse:collapse;font-size:14px}.score th,.score td{border:1px solid #e0b99c;padding:7px;text-align:center}.score th{background:#ffe9d6}.tip{background:#f8fff2;border:2px solid #bedba3;border-radius:14px;padding:8px;margin-top:8px;font-size:13px;font-weight:800;color:#44622d}
+
+/* --- 盛り上げUI追加：派手な時計回り矢印・順番演出・ピック専用盤面 --- */
+.table.playing-now{background:radial-gradient(circle at 50% 45%,#fffaf0,#ffe1d6 65%,#ffd6d6);position:relative;overflow:hidden}
+.table.playing-now:before{content:'↻';position:absolute;inset:auto 12px 8px auto;font-size:72px;color:rgba(182,64,64,.07);font-weight:900;pointer-events:none}
+.seat .seat-arrow{background:linear-gradient(135deg,#fff,#ffe9c7);border:2px solid #e7b35c;color:#8b421e;box-shadow:0 0 0 2px rgba(255,255,255,.7),0 7px 16px rgba(182,94,40,.18);animation:arrowPulse 1.1s ease-in-out infinite alternate}
+.seat .seat-arrow:after{content:'🐽';font-size:13px;animation:snoutRun .85s linear infinite}
+.seat .seat-arrow.current-next{background:linear-gradient(135deg,#fff4b8,#ffc857);border-color:#d19a19;color:#6e3d00;box-shadow:0 0 0 4px rgba(255,201,67,.25),0 0 18px rgba(255,177,42,.55);animation:arrowHot .55s ease-in-out infinite alternate}
+@keyframes arrowPulse{from{filter:saturate(1);transform:translateY(-50%) scale(1)}to{filter:saturate(1.25);transform:translateY(-50%) scale(1.06)}}
+@keyframes arrowHot{from{filter:brightness(1);opacity:.9}to{filter:brightness(1.15);opacity:1}}
+@keyframes snoutRun{0%{transform:translateX(-2px)}50%{transform:translateX(5px)}100%{transform:translateX(-2px)}}
+.seat-1 .seat-arrow,.seat-3 .seat-arrow{animation-name:arrowPulseVertical}
+@keyframes arrowPulseVertical{from{filter:saturate(1);transform:translateX(-50%) scale(1)}to{filter:saturate(1.25);transform:translateX(-50%) scale(1.06)}}
+.seat.current:before{content:'NOW';position:absolute;z-index:2;top:-10px;left:50%;transform:translateX(-50%);background:#b64040;color:#fff;border-radius:999px;padding:3px 10px;font-size:11px;font-weight:900;box-shadow:0 4px 10px rgba(182,64,64,.25)}
+.seat.has-card .mini-card{animation:cardDrop .42s cubic-bezier(.2,1.25,.35,1)}
+@keyframes cardDrop{from{transform:scale(1.18) translateY(-22px) rotate(-4deg);opacity:.05}to{transform:scale(1.08) translateY(0) rotate(0);opacity:1}}
+.play-trail{margin:8px 0 10px;display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;background:#fffef8;border:2px solid #f1d1a6;border-radius:16px;padding:8px;font-weight:900}
+.play-trail .trail-step{display:flex;align-items:center;gap:4px;border:2px solid #f0c99b;background:#fff;border-radius:999px;padding:5px 8px;font-size:12px}
+.play-trail .trail-step.done{background:#eef8ef;border-color:#a8d2a8}
+.play-trail .trail-step.current{background:#fff2bd;border-color:#d4a536;box-shadow:0 0 0 3px rgba(212,165,54,.18);animation:trailBeat .8s infinite alternate}
+.play-trail .trail-arrow{font-weight:900;color:#b64040;font-size:18px;animation:trailFlow .75s infinite alternate}
+@keyframes trailBeat{from{transform:scale(1)}to{transform:scale(1.06)}}
+@keyframes trailFlow{from{transform:translateX(-2px);opacity:.55}to{transform:translateX(3px);opacity:1}}
+.pick-stage{background:linear-gradient(135deg,#fff7f1,#ffe1e6);border:3px solid #eaa3a3;border-radius:22px;padding:14px;box-shadow:0 12px 30px rgba(182,64,64,.18);position:relative;overflow:hidden}
+.pick-stage:before{content:'ババ抜きピック';position:absolute;right:-18px;top:12px;transform:rotate(8deg);font-size:34px;font-weight:900;color:rgba(182,64,64,.08);white-space:nowrap}
+.pick-stage h3{margin:0 0 8px;color:#b64040;font-size:22px}
+.pick-stage .pick-main{display:grid;grid-template-columns:1fr 84px 1fr;gap:10px;align-items:center}
+.pick-person{background:#fff;border:2px solid #f0c4ac;border-radius:18px;padding:12px;text-align:center;font-weight:900;min-height:118px;box-shadow:0 5px 14px rgba(87,43,30,.08)}
+.pick-person .big{font-size:34px;line-height:1}
+.pick-person.winner{background:#fff8d8;border-color:#d4a536}
+.pick-person.weakest{background:#f7efff;border-color:#9862c4}
+.pick-big-arrow{display:flex;flex-direction:column;align-items:center;justify-content:center;color:#b64040;font-weight:900;font-size:34px;animation:pickArrow 1s infinite alternate}
+.pick-big-arrow small{font-size:11px;color:#8c503e}
+@keyframes pickArrow{from{transform:translateX(-4px) scale(1);filter:brightness(1)}to{transform:translateX(4px) scale(1.08);filter:brightness(1.2)}}
+.pick-stage .pick-hand{display:flex;gap:8px;overflow-x:auto;padding:12px 4px 4px;justify-content:flex-start}
+.pick-stage .pick-card{border:none;background:transparent;padding:0}
+.pick-stage .pick-card:not(:disabled) .back{animation:pickWiggle .72s infinite alternate;cursor:pointer}
+.pick-stage .pick-card:nth-child(2n) .back{animation-delay:.15s}
+.pick-stage .pick-card:nth-child(3n) .back{animation-delay:.3s}
+@keyframes pickWiggle{from{transform:translateY(0) rotate(-2deg)}to{transform:translateY(-8px) rotate(2deg)}}
+.pick-stage .pick-status{margin-top:10px;background:#fff8c9;border-left:7px solid #d4a536;border-radius:14px;padding:10px;font-weight:900}
+.pick-stage .pick-result{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:10px}
+.pick-stage .pick-result .playing-card{transform:scale(1.18);animation:resultPop .42s cubic-bezier(.2,1.35,.35,1)}
+@keyframes resultPop{from{transform:scale(.6) rotate(-8deg);opacity:.05}to{transform:scale(1.18) rotate(0);opacity:1}}
+.table.pick-mode{background:linear-gradient(135deg,#fff,#ffe4e4);border-color:#e69c9c}
+.table.pick-mode .turn-order-bar,.table.pick-mode .table-board{display:none}
+@media(max-width:650px){
+  .pick-stage .pick-main{grid-template-columns:1fr}
+  .pick-big-arrow{transform:rotate(90deg);font-size:28px}
+  .pick-stage:before{font-size:24px}
+}
+
+@media(max-width:650px){#app{padding:8px 8px 80px}.players,.status{grid-template-columns:repeat(2,1fr)}.row>*{flex-basis:100%}.playing-card{width:62px;min-width:62px;height:96px}.art{font-size:24px}.pick .flow,.result-banner{grid-template-columns:1fr}.arrow{text-align:center;transform:rotate(90deg)}.player{min-height:118px}.hero{position:static}.table-board{grid-template-columns:1fr 1fr;grid-template-areas:'p0 p1' 'mid mid' 'p3 p2'}.center-wheel{width:100%;height:auto;border-radius:16px;padding:12px}.seat-0 .seat-arrow{right:-16px}.seat-2 .seat-arrow{left:-16px}.seat-1 .seat-arrow,.seat-3 .seat-arrow{left:50%}}
   </style>
 </head>
 <body>
@@ -79,6 +130,12 @@ function me(){ return state?.players.find(p=>p.id===state.you); }
 function isHost(){ return state && state.you===state.hostId; }
 function playerName(i){ return state?.players[i]?.name || '-'; }
 function face(i){ return faces[i]||'🐷'; }
+function seatNumber(pid){ return pid+1; }
+function playersClockwise(){ return (state?.players||[]).map((_,i)=>i); }
+function gridDisplayOrder(){ const cw=playersClockwise(); return cw.length===4 ? [cw[0],cw[1],cw[3],cw[2]] : cw; }
+function nextPid(pid){ return state?.players?.length ? (pid+1)%state.players.length : pid; }
+function dirSymbol(pid){ return ({0:'→',1:'↓',2:'←',3:'↑'})[pid] || '→'; }
+function orderBadge(order){ return ['①','②','③','④'][order] || String(order+1); }
 function render(){
   if(!state) return;
   $('roomInfo').style.display='block'; $('roomCode').textContent=state.code;
@@ -98,22 +155,75 @@ function renderCommentary(){
   el.innerHTML=list.map(c=>`<div class="comment"><div class="face">${face(c.pid)}</div><div><b>${esc(c.name)}</b><br>「${esc(c.text)}」</div></div>`).join('');
 }
 function renderPlayers(){
-  $('players').innerHTML = state.players.map((p,i)=>`<div class="player ${state.current===i?'active':''}"><div class="pig">${face(i)}</div><div class="name">${esc(p.name)} ${p.id===state.you?'（あなた）':p.cpu?'<span class="cpu-badge">CPU</span>':''}</div><span class="pill">手札 ${p.handCount}</span><span class="pill">ごちそう ${p.scorePileCount}</span><span class="pill">ペア ${p.pairsCount}</span><div class="small">${p.cpu?'自動プレイ':(p.connected?'接続中':'切断')}</div>${p.lastComment?`<div class="talk">${esc(p.lastComment)}</div>`:''}</div>`).join('');
+  const order = gridDisplayOrder();
+  $('players').innerHTML = order.map(i=>{ const p=state.players[i]; if(!p) return ''; return `<div class="player ${state.current===i?'active':''}"><div class="pig">${face(i)}</div><div class="name">${esc(p.name)} ${p.id===state.you?'（あなた）':p.cpu?'<span class="cpu-badge">CPU</span>':''}</div><div class="seat-chip">時計回りの席 ${seatNumber(i)}</div><span class="pill">手札 ${p.handCount}</span><span class="pill">ごちそう ${p.scorePileCount}</span><span class="pill">ペア ${p.pairsCount}</span><div class="small">${p.cpu?'自動プレイ':(p.connected?'接続中':'切断')}</div>${p.lastComment?`<div class="talk">${esc(p.lastComment)}</div>`:''}</div>`; }).join('');
 }
+
 function renderLastTrick(){
   const lt=state.lastTrick;
   $('lastTrick').innerHTML = lt ? `<div class="result-banner"><span>👑 勝者：${esc(lt.winnerName)}<br><small>${esc(lt.winnerCard)}でごちそう山ゲット</small></span><span>💀 最弱：${esc(lt.weakestName)}<br><small>${esc(lt.weakestCard)}で袋を狙われる！</small></span></div>` : '';
 }
 function renderTable(){
-  const slots=[];
-  const lt=state.lastTrick;
-  for(let i=0;i<4;i++){
-    const x=state.trick.find(t=>t.pid===i);
-    const cls = lt && lt.winnerPid===i ? ' win' : lt && lt.weakestPid===i ? ' weak' : '';
-    slots.push(`<div class="slot${cls}"><div class="who">${esc(playerName(i))}</div>${x?cardHTML(x.card):'<span class="small">未プレイ</span>'}</div>`);
+  const pp = state.pendingPick;
+  if(pp){
+    const w=state.players[pp.winnerPid], l=state.players[pp.weakestPid];
+    const ready=Date.now()>=pp.readyAt;
+    let html=`<div class="pick-stage">
+      <h3>🐽 ババ抜きピック専用画面</h3>
+      <div class="pick-main">
+        <div class="pick-person winner"><div class="big">👑🐷</div><div>勝者</div><div>${esc(w.name)}</div></div>
+        <div class="pick-big-arrow">➡<small>1枚ピック</small></div>
+        <div class="pick-person weakest"><div class="big">💀🐽</div><div>最弱</div><div>${esc(l.name)}</div></div>
+      </div>`;
+    if(pp.result){
+      html += `<div class="pick-status">${esc(pp.result.text)}</div><div class="pick-result"><span>引いたカード</span>${cardHTML(pp.result.drawn,true)}</div>`;
+    } else if(state.yourIndex===pp.winnerPid){
+      html += `<div class="pick-status">${ready?'最弱の袋から1枚タップしてピック！':'確認中…誰から引くかを確認しています。'}</div><div class="pick-hand">`;
+      for(let i=0;i<l.handCount;i++) html += `<button class="pick-card" ${ready?'':'disabled'} onclick="pick(${i})"><div class="playing-card back"></div></button>`;
+      html += `</div>`;
+    } else {
+      html += `<div class="pick-status">${ready?`${esc(w.name)} が ${esc(l.name)} の袋から選んでいます。`:`確認中… ${esc(w.name)} が ${esc(l.name)} から1枚ピックします。`}</div><div class="pick-hand">`;
+      for(let i=0;i<l.handCount;i++) html += `<div class="playing-card back"></div>`;
+      html += `</div>`;
+    }
+    html += `</div>`;
+    $('table').classList.add('pick-mode');
+    $('table').classList.remove('playing-now');
+    $('table').innerHTML = html;
+    return;
   }
-  $('table').innerHTML=slots.join('');
+  $('table').classList.remove('pick-mode');
+  $('table').classList.add('playing-now');
+  const lt=state.lastTrick;
+  const order = playersClockwise();
+  const trickMap = new Map((state.trick||[]).map(t=>[t.pid,t]));
+  const lead = state.lead ?? 0;
+  const flow = order.map((_,i)=>(lead+i)%order.length);
+  const trail = flow.map((pid,idx)=>{
+    const done = trickMap.has(pid);
+    const cur = state.current===pid && !done;
+    return `<span class="trail-step ${done?'done':''} ${cur?'current':''}">${orderBadge(idx)} ${esc(playerName(pid))}</span>${idx<flow.length-1?'<span class="trail-arrow">➜</span>':''}`;
+  }).join('');
+  const orderLine = order.map(pid=>{
+    const done = trickMap.has(pid);
+    return `<span class="ord ${state.current===pid&&!state.pendingPick?'current':''} ${done?'done':''}">${seatNumber(pid)}. ${esc(playerName(pid))}</span>${pid!==order[order.length-1]?'<span class="arrowtxt">→</span>':''}`;
+  }).join('');
+  const seats = order.map(pid=>{
+    const x=trickMap.get(pid);
+    const cls = `${x ? ' has-card' : ''}${lt && lt.winnerPid===pid ? ' win' : ''}${lt && lt.weakestPid===pid ? ' weak' : ''}${state.current===pid&&!state.pendingPick ? ' current' : ''}`;
+    const next = nextPid(pid);
+    const arrowCls = state.current===next && !state.pendingPick ? ' current-next' : '';
+    return `<div class="seat seat-${pid}${cls}">
+      <div class="who">${seatNumber(pid)}. ${esc(playerName(pid))}</div>
+      ${x?`<div class="play-badge">${orderBadge(x.order)}手目</div>`:''}
+      ${state.current===pid&&!state.pendingPick?'<div class="turn-flag">▶ 手番</div>':''}
+      ${x?`<div class="mini-card">${cardHTML(x.card)}</div>`:'<span class="small">未プレイ</span>'}
+      <div class="seat-arrow${arrowCls}">${dirSymbol(pid)} ${state.current===next&&!state.pendingPick?'次':''}</div>
+    </div>`;
+  }).join('');
+  $('table').innerHTML=`<div class="turn-order-bar"><span class="small">時計回り：</span>${orderLine}</div><div class="play-trail">${trail}</div><div class="table-board">${seats}<div class="center-wheel"><div class="cw-arrow">↻</div><div>時計回り</div><div class="cw-small">次は ${state.current!=null&&!state.pendingPick?esc(playerName(state.current)):'-'} </div></div></div>`;
 }
+
 function playable(card){
   if(!state || state.phase!=='playing' || state.pendingPick) return false;
   const mi=state.yourIndex; if(state.current!==mi) return false;
@@ -130,23 +240,11 @@ function renderHand(){
 window.play=(id)=>send({type:'play', cardId:id});
 window.pick=(i)=>send({type:'pick', index:i});
 function renderPick(){
-  const box=$('pickBox'); const pp=state.pendingPick;
-  if(!pp){ box.style.display='none'; box.innerHTML=''; return; }
-  box.style.display='block';
-  const w=state.players[pp.winnerPid], l=state.players[pp.weakestPid];
-  const now=Date.now(), ready=now>=pp.readyAt;
-  let html=`<h2>🐽 ババ抜きピック中！</h2><div class="flow"><div class="person">👑 勝者<br>${esc(w.name)}</div><div class="arrow">→</div><div class="person">💀 最弱<br>${esc(l.name)}</div></div>`;
-  if(pp.result){ html += `<div class="message">${esc(pp.result.text)}</div><div class="drawn">${cardHTML(pp.result.drawn,true)}</div>`; }
-  else if(state.yourIndex===pp.winnerPid){
-    html += `<div class="message">${ready?'最弱の袋から1枚タップしてピック！':'確認中…これから相手の袋から1枚選びます。'}</div><div class="pick-row">`;
-    for(let i=0;i<l.handCount;i++) html += `<button class="pick-btn" ${ready?'':'disabled'} onclick="pick(${i})"><div class="playing-card back"></div></button>`;
-    html += `</div>`;
-  } else {
-    html += `<div class="message">${ready?`${esc(w.name)} がカードを選んでいます。`:`確認中… ${esc(w.name)} が ${esc(l.name)} から1枚ピックします。`}</div><div class="pick-row">`;
-    for(let i=0;i<l.handCount;i++) html += `<div class="playing-card back"></div>`;
-    html += `</div>`;
-  }
-  box.innerHTML=html;
+  // ピック中は「場のカード」エリア自体を専用レイアウトへ切り替えるため、
+  // 旧ピックBoxは重複表示しない。
+  const box=$('pickBox');
+  box.style.display='none';
+  box.innerHTML='';
 }
 function renderLog(){ $('log').innerHTML=(state.log||[]).map(x=>`<p><b>${x.time}</b> ${esc(x.text)}</p>`).join(''); }
 function renderScore(){
