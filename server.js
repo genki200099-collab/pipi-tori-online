@@ -277,6 +277,23 @@ function advanceReviewToPick(room, reviewToken, winnerPid, weakestPid){
 function ensureRoomProgress(room){
   if(!room || room.phase !== 'playing') return;
 
+  // 通常進行中なのにcurrentがnullで、レビュー・ピック待ちでもない場合はリードへ復旧。
+  if(room.current == null && !room.pendingPick && !room.trickReview){
+    if(room.trick && room.trick.length>0 && room.trick.length<4){
+      const lastPid = room.trick[room.trick.length-1].pid;
+      room.current = (lastPid + 1) % room.players.length;
+      log(room, '⚠️ 手番表示が停止したため、次プレイヤーへ自動復旧しました。');
+      broadcast(room);
+      return;
+    }
+    if(!room.trick || room.trick.length===0){
+      room.current = room.lead ?? 0;
+      log(room, '⚠️ 手番が未設定だったため、リードプレイヤーへ自動復旧しました。');
+      broadcast(room);
+      return;
+    }
+  }
+
   // ピック結果が出ているのにpendingPickが残り続けている場合は進める。
   if(room.pendingPick && room.pendingPick.result){
     const age = Date.now() - (room.pendingPick.resultAt || Date.now());
