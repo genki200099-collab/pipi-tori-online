@@ -181,6 +181,48 @@ function removeCpu(room, requesterId){
   room.message='CPUを外しました。';
   broadcast(room);
 }
+
+function clearCpuPickTimer(room){
+  if(room.cpuPickTimer){
+    clearTimeout(room.cpuPickTimer);
+    room.cpuPickTimer = null;
+  }
+}
+function ensureCpuPick(room){
+  const pp = room.pendingPick;
+  if(!pp || pp.result) return;
+  const winner = room.players[pp.winnerPid];
+  const weakest = room.players[pp.weakestPid];
+  if(!winner || !winner.cpu || !weakest || weakest.hand.length<=0) return;
+  if(room.cpuPickTimer) return;
+
+  // CPUがピック担当になったら、broadcast依存ではなく専用タイマーで必ず進行させる。
+  const delay = Math.max(500, pp.readyAt - Date.now() + 450);
+  const token = pp.readyAt;
+  room.cpuPickTimer = setTimeout(()=>{
+    room.cpuPickTimer = null;
+    if(room.phase !== 'playing') return;
+    if(!room.pendingPick || room.pendingPick.result) return;
+    if(room.pendingPick.readyAt !== token) return;
+    const currentWinner = room.players[room.pendingPick.winnerPid];
+    const currentWeakest = room.players[room.pendingPick.weakestPid];
+    if(!currentWinner || !currentWinner.cpu || !currentWeakest || currentWeakest.hand.length<=0) return;
+    doPick(room, currentWinner.id, Math.floor(Math.random() * currentWeakest.hand.length));
+  }, delay);
+
+  // 念のためのフェイルセーフ。何らかの理由で上のタイマーが外れても、数秒後に自動復旧。
+  if(room.cpuPickFailSafeTimer) clearTimeout(room.cpuPickFailSafeTimer);
+  room.cpuPickFailSafeTimer = setTimeout(()=>{
+    if(room.phase !== 'playing') return;
+    if(!room.pendingPick || room.pendingPick.result) return;
+    const currentWinner = room.players[room.pendingPick.winnerPid];
+    const currentWeakest = room.players[room.pendingPick.weakestPid];
+    if(!currentWinner || !currentWinner.cpu || !currentWeakest || currentWeakest.hand.length<=0) return;
+    log(room, '⚠️ CPUピックが遅延したため、自動復旧しました。');
+    doPick(room, currentWinner.id, Math.floor(Math.random() * currentWeakest.hand.length));
+  }, Math.max(3500, delay + 3500));
+}
+
 function isCpuTurn(room){ return room.phase==='playing' && room.current!=null && room.players[room.current]?.cpu && !room.pendingPick; }
 function chooseCpuCard(room, pid){
   const allowed = [...playableIds(room, pid)];
@@ -210,8 +252,7 @@ function scheduleCpu(room){
   if(room.trickReview && room.trickReview.until > Date.now()) return;
   const pp = room.pendingPick;
   if(pp && room.players[pp.winnerPid]?.cpu && !pp.result){
-    const delay = Math.max(500, pp.readyAt - Date.now() + 350);
-    room.cpuTimer = setTimeout(()=>{ room.cpuTimer=null; doCpuPick(room); }, delay);
+    ensureCpuPick(room);
     return;
   }
   if(isCpuTurn(room)){
@@ -227,12 +268,16 @@ function doCpuPlay(room){
 function doCpuPick(room){
   const pp = room.pendingPick;
   if(!pp || pp.result || !room.players[pp.winnerPid]?.cpu) return;
-  doPick(room, room.players[pp.winnerPid].id, Math.floor(Math.random() * Math.max(1, room.players[pp.weakestPid].hand.length)));
+  const weakest = room.players[pp.weakestPid];
+  if(!weakest || weakest.hand.length<=0) return;
+  doPick(room, room.players[pp.winnerPid].id, Math.floor(Math.random() * weakest.hand.length));
 }
 
 function startGame(room, requesterId){
   if(room.hostId !== requesterId) return;
   if(room.players.length !== 4) { room.message='4人そろうと開始できます。足りない席はCPUを追加してください。'; broadcast(room); return; }
+  clearCpuPickTimer(room);
+  if(room.cpuPickFailSafeTimer){ clearTimeout(room.cpuPickFailSafeTimer); room.cpuPickFailSafeTimer=null; }
   room.phase='playing'; room.round=1; room.lead=Math.floor(Math.random()*4); room.current=room.lead; room.trick=[]; room.leadSuit=null; room.pendingPick=null; room.stock=[];
   for(const p of room.players){ p.hand=[]; p.scorePile=[]; p.pairs=[]; p.out=false; p.final=null; }
   dealInitial(room);
@@ -308,6 +353,7 @@ function resolveTrick(room){
       const readyAt = Date.now() + 1800;
       room.pendingPick = {winnerPid:winner.pid, weakestPid:weakest.pid, readyAt, result:null};
       room.message = `🐽 ババ抜きピック！ ${wp.name} が ${lp.name} の袋から1枚選びます。`;
+      ensureCpuPick(room);
       const line = cpuPickLine(room, winner.pid, weakest.pid); if(line) say(room, winner.pid, line);
       broadcast(room);
       setTimeout(()=>broadcast(room), 1850);
@@ -333,6 +379,8 @@ function doPick(room, playerId, targetIndex){
   sortHand(wp.hand); sortHand(lp.hand);
   const resultText = drawn.joker ? `${wp.name} はババブタを引いた！` : paired ? `${wp.name} は ${drawn.rank} のおそろいペアを浄化！` : `${wp.name} は ${cardText(drawn)} を手札に加えた。`;
   pp.result = {drawn, paired: !!paired, text: resultText};
+  clearCpuPickTimer(room);
+  if(room.cpuPickFailSafeTimer){ clearTimeout(room.cpuPickFailSafeTimer); room.cpuPickFailSafeTimer=null; }
   log(room, `🐽 ${resultText}`);
   if(wp.cpu) say(room, pp.winnerPid, resultLine(drawn, !!paired));
   else { const cpu = room.players.find((p,i)=>p.cpu && i!==pp.winnerPid); if(cpu){ const ci=room.players.indexOf(cpu); say(room, ci, resultLine(drawn, !!paired)); } }
@@ -341,6 +389,8 @@ function doPick(room, playerId, targetIndex){
   setTimeout(()=>{ if(room.pendingPick===pp) finishAfterPick(room, pp.winnerPid); }, 2600);
 }
 function finishAfterPick(room, winnerPid){
+  clearCpuPickTimer(room);
+  if(room.cpuPickFailSafeTimer){ clearTimeout(room.cpuPickFailSafeTimer); room.cpuPickFailSafeTimer=null; }
   room.pendingPick=null;
   if(checkRoundEnd(room)) { broadcast(room); return; }
   room.trick=[]; room.leadSuit=null; room.lead=winnerPid; room.current=winnerPid;
