@@ -129,6 +129,7 @@ function publicState(room, viewerId){
     })),
     commentary: (room.commentary || []).filter(x=>x.expiresAt > Date.now()).slice(0,4),
     lastTrick: room.lastTrick && room.lastTrick.expiresAt > Date.now() ? room.lastTrick : null,
+    trickReview: room.trickReview && room.trickReview.until > Date.now() ? room.trickReview : null,
     log: room.log,
   };
 }
@@ -206,6 +207,7 @@ function chooseCpuCard(room, pid){
 function scheduleCpu(room){
   if(room.cpuTimer) return;
   if(room.phase !== 'playing') return;
+  if(room.trickReview && room.trickReview.until > Date.now()) return;
   const pp = room.pendingPick;
   if(pp && room.players[pp.winnerPid]?.cpu && !pp.result){
     const delay = Math.max(500, pp.readyAt - Date.now() + 350);
@@ -251,7 +253,7 @@ function dealInitial(room){
 }
 function playableIds(room, pid){
   const p = room.players[pid]; if(!p) return new Set();
-  if(room.phase !== 'playing' || room.pendingPick || room.current !== pid) return new Set();
+  if(room.phase !== 'playing' || room.pendingPick || room.trickReview || room.current !== pid) return new Set();
   const nonJoker = p.hand.filter(c=>!c.joker);
   if(!room.leadSuit) return new Set(nonJoker.map(c=>c.id));
   const follow = p.hand.filter(c=>!c.joker && c.suit===room.leadSuit);
@@ -275,19 +277,44 @@ function resolveTrick(room){
   let weakest = room.trick[0];
   for(const x of room.trick){ if(x.card.val < weakest.card.val) weakest=x; else if(x.card.val===weakest.card.val && x.order > weakest.order) weakest=x; }
   const wp = room.players[winner.pid], lp = room.players[weakest.pid];
-  room.lastTrick = {winnerPid:winner.pid, weakestPid:weakest.pid, winnerName:wp.name, weakestName:lp.name, winnerCard:cardText(winner.card), weakestCard:cardText(weakest.card), expiresAt:Date.now()+8500};
+
+  // トリックの最終盤面を見せるため、ここではまだピック画面に遷移しない。
+  const reviewUntil = Date.now() + 5000;
+  room.current = null;
+  room.trickReview = {winnerPid:winner.pid, weakestPid:weakest.pid, until:reviewUntil};
+  room.lastTrick = {
+    winnerPid:winner.pid,
+    weakestPid:weakest.pid,
+    winnerName:wp.name,
+    weakestName:lp.name,
+    winnerCard:cardText(winner.card),
+    weakestCard:cardText(weakest.card),
+    expiresAt:reviewUntil + 5000
+  };
+
   if(wp.cpu) say(room, winner.pid, sample(['よし、ごちそう山ゲットだブヒ！','勝ったけど、このあとが怖いブヒ…','取った！でもピックが本番ブヒ。']));
   if(lp.cpu && lp.hand.length>0) say(room, weakest.pid, sample(['えっ、最弱！？やめてブヒ〜！','うわっ、きついな〜。袋を見ないでブヒ！','最弱になったブヒ…嫌な予感しかしないブヒ。']));
   wp.scorePile.push(...room.trick.map(x=>x.card));
   log(room, `👑 ${wp.name} が勝利。場の4枚をごちそう山へ。`);
   log(room, `💀 最弱は ${lp.name}（${cardText(weakest.card)}）。`);
-  if(lp.hand.length>0){
-    const readyAt = Date.now() + 1800;
-    room.pendingPick = {winnerPid:winner.pid, weakestPid:weakest.pid, readyAt, result:null};
-    room.message = `🐽 ババ抜きピック！ ${wp.name} が ${lp.name} の袋から1枚選びます。`;
-    const line = cpuPickLine(room, winner.pid, weakest.pid); if(line) say(room, winner.pid, line);
-    setTimeout(()=>broadcast(room), 1850);
-  } else finishAfterPick(room, winner.pid);
+  room.message = `トリック終了！ 👑勝者は ${wp.name}、💀最弱は ${lp.name}。5秒後にババ抜きピックへ進みます。`;
+
+  const reviewToken = reviewUntil;
+  setTimeout(()=>{
+    if(room.phase !== 'playing') return;
+    if(!room.trickReview || room.trickReview.until !== reviewToken) return;
+    room.trickReview = null;
+    if(lp.hand.length>0){
+      const readyAt = Date.now() + 1800;
+      room.pendingPick = {winnerPid:winner.pid, weakestPid:weakest.pid, readyAt, result:null};
+      room.message = `🐽 ババ抜きピック！ ${wp.name} が ${lp.name} の袋から1枚選びます。`;
+      const line = cpuPickLine(room, winner.pid, weakest.pid); if(line) say(room, winner.pid, line);
+      broadcast(room);
+      setTimeout(()=>broadcast(room), 1850);
+    } else {
+      finishAfterPick(room, winner.pid);
+    }
+  }, 5000);
 }
 function doPick(room, playerId, targetIndex){
   const pp = room.pendingPick; if(!pp || pp.result) return;
@@ -321,19 +348,27 @@ function finishAfterPick(room, winnerPid){
   broadcast(room);
 }
 function checkRoundEnd(room){
-  const outPid = room.players.findIndex(p=>p.hand.length===0);
+  const outPid = room.players.findIndex(p=>p.hand.length===0 || (p.hand.length===1 && p.hand[0].joker));
   if(outPid<0) return false;
   const out = room.players[outPid];
+  const onlyJoker = out.hand.length===1 && out.hand[0].joker;
   if(room.round===1){
     room.round=2; room.trick=[]; room.leadSuit=null; room.lead=outPid; room.current=outPid;
     // 13枚まで補充。足りない場合は新しい通常山札を追加する簡易処理。
     let refill = makeDeck().filter(c=>!c.joker); shuffle(refill);
     for(const p of room.players){ while(p.hand.length<13){ p.hand.push((room.stock.length?room.stock:refill).pop()); } sortHand(p.hand); }
-    room.message=`${out.name} が上がり！第2ラウンドへ。残り手札を持ち越して13枚まで補充しました。`;
+    room.message = onlyJoker
+      ? `${out.name} の袋にババブタ1枚だけが残りました！第1ラウンド終了。残り手札を持ち越して13枚まで補充します。`
+      : `${out.name} が上がり！第2ラウンドへ。残り手札を持ち越して13枚まで補充しました。`;
     if(out.cpu) say(room, outPid, sample(['上がりブヒ！後半もこの調子でいくブヒ！','まずは抜けたブヒ！でも後半があるブヒ。']));
     log(room, room.message);
   } else {
-    room.phase='finished'; room.message=`${out.name} が上がり！ゲーム終了。`; if(out.cpu) say(room, outPid, sample(['上がり！ごちそう山を数えるブヒ！','決着ブヒ！点数計算だブヒ！'])); log(room, room.message); score(room);
+    room.phase='finished';
+    room.message = onlyJoker
+      ? `${out.name} の袋にババブタ1枚だけが残りました！ゲーム終了。`
+      : `${out.name} が上がり！ゲーム終了。`;
+    if(out.cpu) say(room, outPid, onlyJoker ? sample(['ババブタだけ残ったブヒ…終わったブヒ…','袋の中がババブタだけブヒ！？']) : sample(['上がり！ごちそう山を数えるブヒ！','決着ブヒ！点数計算だブヒ！']));
+    log(room, room.message); score(room);
   }
   return true;
 }
