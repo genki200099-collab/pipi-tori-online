@@ -138,6 +138,9 @@ function publicState(room, viewerId){
       final:p.final || null,
       lastComment: p.lastComment && p.lastComment.expiresAt > Date.now() ? p.lastComment.text : null,
     })),
+    // クライアント側の判定ズレを防ぐため、出せるカードはサーバーで確定して送る。
+    playableCardIds: viewerIndex >= 0 ? [...playableIds(room, viewerIndex)] : [],
+    isYourTurn: viewerIndex >= 0 && room.current === viewerIndex && room.phase === 'playing' && !room.pendingPick && !room.trickReview,
     commentary: (room.commentary || []).filter(x=>x.expiresAt > Date.now()).slice(0,4),
     lastTrick: room.lastTrick && room.lastTrick.expiresAt > Date.now() ? room.lastTrick : null,
     trickReview: room.trickReview && room.trickReview.until > Date.now() ? room.trickReview : null,
@@ -357,6 +360,19 @@ function ensureRoomProgress(room){
     }
   }
 
+  // 人間の通常手番でUI側が取りこぼした場合に備えて、出せるカードがある状態を定期再送する。
+  if(!room.pendingPick && !room.trickReview && room.current != null && !room.players[room.current]?.cpu){
+    const ids = playableIds(room, room.current);
+    if(ids.size > 0){
+      const now = Date.now();
+      if(!room.lastHumanTurnRebroadcastAt || now - room.lastHumanTurnRebroadcastAt > 2500){
+        room.lastHumanTurnRebroadcastAt = now;
+        broadcast(room);
+        return;
+      }
+    }
+  }
+
   // CPUピック待ちで止まっている場合は再予約。
   if(room.pendingPick && !room.pendingPick.result && room.players[room.pendingPick.winnerPid]?.cpu){
     ensureCpuPick(room);
@@ -500,10 +516,19 @@ function dealInitial(room){
   log(room, `均一配札のため ${cardText(room.removedCard)} を箱に戻しました。`);
 }
 function playableIds(room, pid){
+  pid = Number(pid);
   const p = room.players[pid]; if(!p) return new Set();
-  if(room.phase !== 'playing' || room.pendingPick || room.trickReview || room.current !== pid) return new Set();
+  if(room.phase !== 'playing' || room.pendingPick || room.trickReview) return new Set();
+  if(Number(room.current) !== pid) return new Set();
+
+  // ババブタは場に出せない。通常カードがない場合は出せるカードなし。
   const nonJoker = p.hand.filter(c=>!c.joker);
+  if(!nonJoker.length) return new Set();
+
+  // リードスート未設定＝トリック先頭。通常カードなら何でも出せる。
   if(!room.leadSuit) return new Set(nonJoker.map(c=>c.id));
+
+  // マストフォロー。
   const follow = p.hand.filter(c=>!c.joker && c.suit===room.leadSuit);
   return new Set((follow.length ? follow : nonJoker).map(c=>c.id));
 }
@@ -512,6 +537,7 @@ function playCard(room, playerId, cardId){
   const allowed = playableIds(room, pid);
   if(!allowed.has(cardId)) { room.message='そのカードは出せません。マストフォロー、またはババブタ不可を確認！'; broadcast(room); return; }
   const p = room.players[pid]; const idx = p.hand.findIndex(c=>c.id===cardId); const card = p.hand.splice(idx,1)[0];
+  room.lastHumanTurnRebroadcastAt = 0;
   if(!room.leadSuit) room.leadSuit = card.suit;
   room.trick.push({pid, card, order:room.trick.length});
   room.message = `${p.name} が ${cardText(card)} を出しました。`;

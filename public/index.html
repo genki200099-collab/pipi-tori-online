@@ -253,7 +253,12 @@ function handleHandCardEvent(ev){
   if(now - __lastCardTapAt < 350) return; // pointerup + click の二重送信防止
   __lastCardTapAt = now;
   ev.preventDefault();
-  requestPlay(btn.dataset.cardId);
+  const cardId = btn.dataset.cardId;
+  if(!state || !Array.isArray(state.playableCardIds) || !state.playableCardIds.includes(cardId)){
+    // disabled属性が何らかの理由でズレた場合でも、誤送信を防ぐ。
+    return;
+  }
+  requestPlay(cardId);
 }
 document.addEventListener('pointerup', handleHandCardEvent);
 document.addEventListener('click', handleHandCardEvent);
@@ -270,6 +275,7 @@ function connect(after){
       state=msg.state;
       // サーバー基準の readyInMs から、クライアント側の疑似ready時刻を作る。
       // PC Edgeのローカル時計差で「確認中…」から進まない問題を防ぐ。
+      if(!Array.isArray(state.playableCardIds)) state.playableCardIds = [];
       if(state.pendingPick && !state.pendingPick.clientReadyAt){
         const ms = Number(state.pendingPick.readyInMs ?? 0);
         state.pendingPick.clientReadyAt = Date.now() + Math.max(0, ms);
@@ -428,20 +434,24 @@ function renderTable(){
 }
 
 function playable(card){
-  if(!state || state.phase!=='playing' || state.pendingPick || state.trickReview) return false;
-  const mi=state.yourIndex; if(state.current!==mi) return false;
-  if(card.joker) return false;
-  const hand=me()?.hand || [];
-  if(!state.leadSuit) return true;
-  const hasLead = hand.some(c=>!c.joker && c.suit===state.leadSuit);
-  return hasLead ? card.suit===state.leadSuit : true;
+  if(!state || !card) return false;
+  // 出せるカード判定はサーバーを正とする。Edge/ラウンド開始直後の判定ズレ対策。
+  return Array.isArray(state.playableCardIds) && state.playableCardIds.includes(card.id);
 }
 function renderHand(){
   const hand=me()?.hand || [];
-  $('hand').innerHTML = hand.map(c=>{
-    const can = playable(c);
+  const playableSet = new Set(state?.playableCardIds || []);
+  let note = '';
+  if(state?.phase === 'playing' && state?.isYourTurn && playableSet.size === 0){
+    note = '<div class="message">出せる通常カードがありません。ババブタだけの場合はラウンド終了処理を待っています。</div>';
+  } else if(state?.phase === 'playing' && state?.isYourTurn){
+    note = '<div class="tip">あなたの手番です。光っているカードを選んでください。</div>';
+  }
+  const cards = hand.map(c=>{
+    const can = playableSet.has(c.id);
     return `<button type="button" class="hand-card ${can?'':'un'}" ${can?'': 'disabled'} data-card-id="${escAttr(c.id)}">${cardHTML(c, can)}</button>`;
   }).join('') || '<p class="small">手札はまだありません。</p>';
+  $('hand').innerHTML = note + cards;
 }
 function requestPlay(id){
   send({type:'play', cardId:String(id)});
