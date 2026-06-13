@@ -22,7 +22,7 @@ h2{margin:0 0 10px}.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.
 .hand-card{border:none;background:transparent;padding:0;margin:0;display:block;touch-action:manipulation;-webkit-user-select:none;user-select:none}
 .hand-card:not(:disabled){cursor:pointer}
 .hand-card:disabled{cursor:not-allowed}
-.hand-card:focus-visible{outline:3px solid #d4a536;border-radius:12px}.playing-card{width:72px;min-width:72px;height:110px;border-radius:10px;border:2px solid #6a3a2f;background:#fff;display:flex;flex-direction:column;justify-content:space-between;padding:6px;box-shadow:0 4px 10px rgba(0,0,0,.16);position:relative;user-select:none}.playing-card.playable{cursor:pointer;transform:translateY(-8px);border-color:var(--gold);box-shadow:0 8px 16px rgba(180,115,40,.35)}.playing-card.playable:after{content:'出せる';position:absolute;top:-12px;left:50%;transform:translateX(-50%);font-size:10px;background:var(--gold);color:white;border-radius:999px;padding:2px 6px;font-weight:900}.un .playing-card,.playing-card.unplayable{opacity:.45;filter:grayscale(.25)}.rank{font-weight:900;font-size:20px}.suit{font-size:22px}.art{text-align:center;font-size:30px}.back{background:linear-gradient(135deg,#f6a3a3,#d94d5f);border-color:#9a2b38;color:#fff;align-items:center;justify-content:center;text-align:center}.back:before{content:'🐷';font-size:34px}.joker{background:linear-gradient(135deg,#fff,#e9ddff);border-color:#4d2c72}.spades{color:#222}.clubs{color:#218042}.hearts,.diamonds{color:#c92929}.message{margin-top:8px;background:#fff3c9;border-left:6px solid var(--gold);padding:10px;border-radius:12px;font-weight:900}.log{max-height:220px;overflow:auto;font-size:13px;line-height:1.55;background:#fffaf2;border-radius:12px;padding:8px}.log p{margin:0 0 6px;padding-bottom:6px;border-bottom:1px dashed #edd0b8}.log p:first-child{background:#fff3c9;border-radius:10px;padding:7px}.pick{background:linear-gradient(135deg,#fff,#ffe4e4);border:3px solid #e9a1a1;border-radius:22px;padding:12px;animation:glow 1.4s ease-in-out infinite alternate}.pick h2{color:var(--red);margin:0 0 8px}@keyframes glow{from{box-shadow:0 8px 22px rgba(182,64,64,.16)}to{box-shadow:0 8px 30px rgba(182,64,64,.36)}}.pick-row{display:flex;gap:8px;overflow-x:auto;padding:10px 0}.pick-btn{border:none;background:transparent;padding:0;cursor:pointer;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+.hand-card:focus-visible{outline:3px solid #d4a536;border-radius:12px}.playing-card{width:72px;min-width:72px;height:110px;border-radius:10px;border:2px solid #6a3a2f;background:#fff;display:flex;flex-direction:column;justify-content:space-between;padding:6px;box-shadow:0 4px 10px rgba(0,0,0,.16);position:relative;user-select:none;overflow:hidden}.playing-card.playable{cursor:pointer;transform:translateY(-8px);border-color:var(--gold);box-shadow:0 8px 16px rgba(180,115,40,.35)}.un .playing-card,.playing-card.unplayable{opacity:.45;filter:grayscale(.25)}.rank{font-weight:900;font-size:20px}.suit{font-size:22px}.art{text-align:center;font-size:30px}.back{background:linear-gradient(135deg,#f6a3a3,#d94d5f);border-color:#9a2b38;color:#fff;align-items:center;justify-content:center;text-align:center}.back:before{content:'🐷';font-size:34px}.joker{background:linear-gradient(135deg,#fff,#e9ddff);border-color:#4d2c72}.spades{color:#222}.clubs{color:#218042}.hearts,.diamonds{color:#c92929}.madpig{background:linear-gradient(180deg,#fff7f7 0%,#ffe1e1 58%,#ffd0d0 100%);border-color:#a32531;color:#7c121f;box-shadow:0 0 0 2px rgba(163,37,49,.12),0 8px 18px rgba(163,37,49,.26)}.madpig.playable{border-color:#c53d4a;box-shadow:0 0 0 3px rgba(197,61,74,.18),0 0 18px rgba(197,61,74,.28),0 8px 18px rgba(163,37,49,.32)}.madpig .rank,.madpig .suit{color:#8f1724}.madpig .art{filter:drop-shadow(0 0 4px rgba(163,37,49,.35))}.madpig:before{content:'☠';position:absolute;right:5px;top:2px;font-size:18px;color:#8f1724;opacity:.9}.danger-chip{position:absolute;left:50%;bottom:4px;transform:translateX(-50%);background:linear-gradient(135deg,#b8192f,#7a1020);color:#fff;border-radius:999px;padding:1px 7px;font-size:10px;font-weight:900;letter-spacing:.2px;box-shadow:0 3px 8px rgba(0,0,0,.2);white-space:nowrap}.madpig-banner{position:absolute;left:-26px;top:10px;transform:rotate(-40deg);background:#8f1724;color:#fff;font-size:9px;font-weight:900;padding:2px 24px;letter-spacing:.4px;box-shadow:0 2px 6px rgba(0,0,0,.18)}.message{margin-top:8px;background:#fff3c9;border-left:6px solid var(--gold);padding:10px;border-radius:12px;font-weight:900}.log{max-height:220px;overflow:auto;font-size:13px;line-height:1.55;background:#fffaf2;border-radius:12px;padding:8px}.log p{margin:0 0 6px;padding-bottom:6px;border-bottom:1px dashed #edd0b8}.log p:first-child{background:#fff3c9;border-radius:10px;padding:7px}.pick{background:linear-gradient(135deg,#fff,#ffe4e4);border:3px solid #e9a1a1;border-radius:22px;padding:12px;animation:glow 1.4s ease-in-out infinite alternate}.pick h2{color:var(--red);margin:0 0 8px}@keyframes glow{from{box-shadow:0 8px 22px rgba(182,64,64,.16)}to{box-shadow:0 8px 30px rgba(182,64,64,.36)}}.pick-row{display:flex;gap:8px;overflow-x:auto;padding:10px 0}.pick-btn{border:none;background:transparent;padding:0;cursor:pointer;touch-action:manipulation;-webkit-user-select:none;user-select:none}
 .pick-btn:disabled{cursor:not-allowed}.pick-btn:disabled{opacity:.7}.pick-btn:not(:disabled) .back{animation:shake 1.2s infinite}@keyframes shake{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}@keyframes pulse{from{transform:scale(1)}to{transform:scale(1.06)}}.pick .flow{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center}.pick .person{background:#fff7ed;border:2px solid #f1c7a8;border-radius:16px;padding:10px;text-align:center;font-weight:900}.arrow{font-size:28px;color:var(--red);font-weight:900}.drawn{display:flex;justify-content:center;margin-top:10px;transform:scale(1.15)}.score{width:100%;border-collapse:collapse;font-size:14px}.score th,.score td{border:1px solid #e0b99c;padding:7px;text-align:center}.score th{background:#ffe9d6}.tip{background:#f8fff2;border:2px solid #bedba3;border-radius:14px;padding:8px;margin-top:8px;font-size:13px;font-weight:800;color:#44622d}
 .rule-summary{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:8px}
 .rule-card{background:#fffaf2;border:2px solid #efd0b4;border-radius:16px;padding:10px;box-shadow:0 4px 12px rgba(66,36,20,.06)}
@@ -291,6 +291,7 @@ function me(){ return state?.players.find(p=>p.id===state.you); }
 function isHost(){ return state && state.you===state.hostId; }
 function playerName(i){ return state?.players[i]?.name || '-'; }
 function face(i){ return faces[i]||'🐷'; }
+function isMadPig(card){ return !!card && !card.joker && card.suit==='♠' && String(card.rank)==='Q'; }
 function seatNumber(pid){ return pid+1; }
 function playersClockwise(){ return (state?.players||[]).map((_,i)=>i); }
 function gridDisplayOrder(){ const cw=playersClockwise(); return cw.length===4 ? [cw[0],cw[1],cw[3],cw[2]] : cw; }
@@ -451,13 +452,22 @@ function renderHand(){
     const can = playableSet.has(c.id);
     return `<button type="button" class="hand-card ${can?'':'un'}" ${can?'': 'disabled'} data-card-id="${escAttr(c.id)}">${cardHTML(c, can)}</button>`;
   }).join('') || '<p class="small">手札はまだありません。</p>';
-  $('hand').innerHTML = note + cards;
+  const madPigNotice = hand.some(isMadPig) ? '<div class="message">☠️🐷 スペードQは <b>マッド・ピッグ</b>。最終的に持つと <b>-13点</b> の恐ろしいカードです。</div>' : '';
+  $('hand').innerHTML = note + madPigNotice + cards;
 }
 function requestPlay(id){
+  if(!ws || ws.readyState!==1){
+    $('message').textContent = '通信が切れています。ページを再読み込みして再参加してください。';
+    return;
+  }
   send({type:'play', cardId:String(id)});
 }
 window.play = requestPlay;
 function requestPick(i){
+  if(!ws || ws.readyState!==1){
+    $('message').textContent = '通信が切れています。ページを再読み込みして再参加してください。';
+    return;
+  }
   send({type:'pick', index:Number(i)});
 }
 window.pick = requestPick;
@@ -542,7 +552,14 @@ function renderScore(){
 function cardHTML(c, playable=false){
   if(!c) return '';
   if(c.joker) return `<div class="playing-card joker ${playable?'playable':''}"><div class="rank">JOKER</div><div class="art">🤡🐷</div><div class="suit">ババブタ</div></div>`;
-  return `<div class="playing-card ${suitsClass[c.suit]} ${playable?'playable':''}"><div><div class="rank">${c.rank}</div><div class="suit">${c.suit}</div></div><div class="art">${art[c.suit]}</div><div class="suit">${c.suit}</div></div>`;
+  const mad = isMadPig(c);
+  return `<div class="playing-card ${suitsClass[c.suit]} ${mad?'madpig':''} ${playable?'playable':''}">
+    ${mad?'<div class="madpig-banner">DANGER</div>':''}
+    <div><div class="rank">${c.rank}</div><div class="suit">${c.suit}</div></div>
+    <div class="art">${mad?'☠️🐷':art[c.suit]}</div>
+    <div class="suit">${mad?'マッド・ピッグ':c.suit}</div>
+    ${mad?'<div class="danger-chip">失点 -13</div>':''}
+  </div>`;
 }
 function esc(s){ return String(s??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])); }
 function escAttr(s){ return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }

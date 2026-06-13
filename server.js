@@ -36,6 +36,7 @@ setInterval(()=>{
 
 const suits = ['♠','♥','♦','♣'];
 const ranks = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
+let deckSerial = 0; // 第2ラウンド補充時もカードIDが重複しないようにする。
 const value = Object.fromEntries(ranks.map((r,i)=>[r,i+2]));
 
 function code(){
@@ -47,8 +48,9 @@ function uid(){ return crypto.randomBytes(8).toString('hex'); }
 function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
 function makeDeck(){
   let deck=[]; let id=0;
-  for(const s of suits) for(const r of ranks) deck.push({id:`${s}${r}-${id++}`,suit:s,rank:r,val:value[r],joker:false});
-  deck.push({id:`JOKER-${id++}`,suit:null,rank:'JOKER',val:0,joker:true});
+  const serial = deckSerial++;
+  for(const s of suits) for(const r of ranks) deck.push({id:`D${serial}-${s}${r}-${id++}`,suit:s,rank:r,val:value[r],joker:false});
+  deck.push({id:`D${serial}-JOKER-${id++}`,suit:null,rank:'JOKER',val:0,joker:true});
   return deck;
 }
 function cardText(c){ return c.joker ? '🃏ババブタ' : `${c.rank}${c.suit}`; }
@@ -70,6 +72,30 @@ function say(room, pid, text){
   room.commentary = room.commentary.slice(0,8);
   log(room, `💬 ${p.name}「${text}」`);
 }
+
+function isRoundEndHand(p){
+  return !!p && (p.hand.length===0 || (p.hand.length===1 && p.hand[0].joker));
+}
+function activePlayerCount(room){
+  return room.players ? room.players.length : 0;
+}
+function safeBroadcast(room){
+  try { broadcast(room); } catch(e) { console.error('safeBroadcast error', e); }
+}
+function safeFinishBecauseNoPlayable(room, pid){
+  const p = room.players[pid];
+  if(!p) return false;
+  if(isRoundEndHand(p)){
+    log(room, `⚠️ ${p.name} の手札が終了条件を満たしたため、ラウンド終了処理へ進みます。`);
+    room.pendingPick = null;
+    room.trickReview = null;
+    checkRoundEnd(room);
+    broadcast(room);
+    return true;
+  }
+  return false;
+}
+
 function sample(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 function cpuPlayLine(room, pid, card){
   const p = room.players[pid];
@@ -149,7 +175,12 @@ function publicState(room, viewerId){
 }
 function send(ws, type, payload){ if(ws.readyState===WebSocket.OPEN) ws.send(JSON.stringify({type, ...payload})); }
 function broadcast(room){
-  for(const p of room.players) if(p.ws) send(p.ws,'state',{state: publicState(room,p.id)});
+  if(!room || !room.players) return;
+  for(const p of room.players){
+    if(p.ws && p.ws.readyState===WebSocket.OPEN){
+      send(p.ws,'state',{state: publicState(room,p.id)});
+    }
+  }
   scheduleCpu(room);
 }
 function roomByWs(ws){ return rooms.get(ws.roomCode); }
@@ -227,6 +258,7 @@ function clearAllProgressTimers(room){
   if(room.cpuTimer){ clearTimeout(room.cpuTimer); room.cpuTimer=null; }
   if(room.cpuPickTimer){ clearTimeout(room.cpuPickTimer); room.cpuPickTimer=null; }
   if(room.cpuPickFailSafeTimer){ clearTimeout(room.cpuPickFailSafeTimer); room.cpuPickFailSafeTimer=null; }
+  if(room.recoverTimer){ clearTimeout(room.recoverTimer); room.recoverTimer=null; }
 }
 function ensurePickFinish(room, pp, winnerPid, delay=2600){
   clearPickFinishTimer(room);
@@ -324,6 +356,19 @@ function advanceReviewToPick(room, reviewToken, winnerPid, weakestPid){
 
 function ensureRoomProgress(room){
   if(!room || room.phase !== 'playing') return;
+  if(!room.players || room.players.length !== 4) return;
+
+  // 0枚/ジョーカー1枚の終了条件をいつでも拾う。
+  // pendingPickの結果表示中やtrickReview中は画面演出を優先するが、通常手番中なら即処理。
+  if(!room.pendingPick && !room.trickReview){
+    const endPid = room.players.findIndex(isRoundEndHand);
+    if(endPid >= 0){
+      log(room, '⚠️ 終了条件の手札を検知したため、自動でラウンド終了処理へ進みます。');
+      checkRoundEnd(room);
+      broadcast(room);
+      return;
+    }
+  }
 
   // 4枚出揃っているのにレビューにもピックにも進んでいない場合は、トリック解決をやり直す。
   if(!room.pendingPick && !room.trickReview && room.trick && room.trick.length===4){
@@ -333,7 +378,16 @@ function ensureRoomProgress(room){
     return;
   }
 
-  // 通常進行中なのにcurrentがnullで、レビュー・ピック待ちでもない場合はリードへ復旧。
+  // トリックが5枚以上など不正状態になった場合は、先頭4枚で解決する。
+  if(!room.pendingPick && !room.trickReview && room.trick && room.trick.length>4){
+    log(room, '⚠️ 場のカード枚数が不正だったため、先頭4枚で復旧しました。');
+    room.trick = room.trick.slice(0,4);
+    resolveTrick(room);
+    broadcast(room);
+    return;
+  }
+
+  // 通常進行中なのにcurrentがnullで、レビュー・ピック待ちでもない場合は復旧。
   if(room.current == null && !room.pendingPick && !room.trickReview){
     if(room.trick && room.trick.length>0 && room.trick.length<4){
       const lastPid = room.trick[room.trick.length-1].pid;
@@ -343,10 +397,33 @@ function ensureRoomProgress(room){
       return;
     }
     if(!room.trick || room.trick.length===0){
-      room.current = room.lead ?? 0;
+      room.current = Number.isInteger(room.lead) ? room.lead : 0;
       log(room, '⚠️ 手番が未設定だったため、リードプレイヤーへ自動復旧しました。');
       broadcast(room);
       return;
+    }
+  }
+
+  // currentが範囲外の場合は補正。
+  if(room.current != null && (!Number.isInteger(room.current) || room.current < 0 || room.current >= room.players.length)){
+    room.current = ((Number(room.current)||0) % room.players.length + room.players.length) % room.players.length;
+    log(room, '⚠️ 手番番号が不正だったため、自動補正しました。');
+    broadcast(room);
+    return;
+  }
+
+  // 現在プレイヤーに出せるカードがない場合、終了条件なら終了。そうでなければ状態再送。
+  if(!room.pendingPick && !room.trickReview && room.current != null){
+    const ids = playableIds(room, room.current);
+    if(ids.size === 0){
+      if(safeFinishBecauseNoPlayable(room, room.current)) return;
+      const now = Date.now();
+      if(!room.lastNoPlayableRebroadcastAt || now - room.lastNoPlayableRebroadcastAt > 2500){
+        room.lastNoPlayableRebroadcastAt = now;
+        log(room, '⚠️ 出せるカードがない状態を検知したため、状態を再送しました。');
+        broadcast(room);
+        return;
+      }
     }
   }
 
@@ -373,6 +450,12 @@ function ensureRoomProgress(room){
     }
   }
 
+  // CPU通常手番でタイマーが外れた場合は再予約。
+  if(!room.pendingPick && !room.trickReview && isCpuTurn(room) && !room.cpuTimer){
+    scheduleCpu(room);
+    return;
+  }
+
   // CPUピック待ちで止まっている場合は再予約。
   if(room.pendingPick && !room.pendingPick.result && room.players[room.pendingPick.winnerPid]?.cpu){
     ensureCpuPick(room);
@@ -383,6 +466,12 @@ function ensureRoomProgress(room){
   if(room.pendingPick && !room.pendingPick.result && !room.players[room.pendingPick.winnerPid]?.cpu){
     if(Date.now() >= room.pendingPick.readyAt && !room.pendingPick.readyBroadcasted){
       room.pendingPick.readyBroadcasted = true;
+      broadcast(room);
+      return;
+    }
+    // クリック待ちが長すぎる場合はゲーム停止ではなく、再送だけする。
+    if(Date.now() >= room.pendingPick.readyAt + 12000){
+      room.pendingPick.readyBroadcasted = false;
       broadcast(room);
       return;
     }
@@ -483,7 +572,15 @@ function doCpuPlay(room){
   if(!isCpuTurn(room)) return;
   const pid = room.current;
   const card = chooseCpuCard(room, pid);
-  if(card){ say(room, pid, cpuPlayLine(room, pid, card)); playCard(room, room.players[pid].id, card.id); }
+  if(card){
+    say(room, pid, cpuPlayLine(room, pid, card));
+    playCard(room, room.players[pid].id, card.id);
+  } else {
+    if(!safeFinishBecauseNoPlayable(room, pid)){
+      log(room, `⚠️ ${room.players[pid].name} が出せるカードを持っていないため、状態を再送しました。`);
+      broadcast(room);
+    }
+  }
 }
 function doCpuPick(room){
   const pp = room.pendingPick;
@@ -498,6 +595,7 @@ function startGame(room, requesterId){
   if(room.players.length !== 4) { room.message='4人そろうと開始できます。足りない席はCPUを追加してください。'; broadcast(room); return; }
   clearAllProgressTimers(room);
   room.phase='playing'; room.round=1; room.lead=Math.floor(Math.random()*4); room.current=room.lead; room.trick=[]; room.leadSuit=null; room.pendingPick=null; room.trickReview=null; room.stock=[];
+  room.lastHumanTurnRebroadcastAt = 0; room.lastNoPlayableRebroadcastAt = 0;
   for(const p of room.players){ p.hand=[]; p.scorePile=[]; p.pairs=[]; p.out=false; p.final=null; }
   dealInitial(room);
   room.message=`第1ラウンド開始。${room.players[room.current].name} からリード。`;
@@ -546,8 +644,18 @@ function playCard(room, playerId, cardId){
   broadcast(room);
 }
 function resolveTrick(room){
-  const leadSuit = room.leadSuit;
+  if(!room.trick || room.trick.length < 4){
+    log(room, '⚠️ トリック解決に必要な4枚が揃っていないため、処理を中断しました。');
+    return;
+  }
+  if(room.trick.length > 4) room.trick = room.trick.slice(0,4);
+  const leadSuit = room.leadSuit || room.trick[0]?.card?.suit;
+  room.leadSuit = leadSuit;
   const winner = room.trick.filter(x=>x.card.suit===leadSuit).sort((a,b)=>b.card.val-a.card.val)[0];
+  if(!winner){
+    log(room, '⚠️ 勝者を判定できなかったため、リードプレイヤーを勝者として復旧しました。');
+    return;
+  }
   let weakest = room.trick[0];
   for(const x of room.trick){ if(x.card.val < weakest.card.val) weakest=x; else if(x.card.val===weakest.card.val && x.order > weakest.order) weakest=x; }
   const wp = room.players[winner.pid], lp = room.players[weakest.pid];
@@ -582,8 +690,23 @@ function doPick(room, playerId, targetIndex){
   if(chooserPid !== pp.winnerPid) return;
   if(Date.now() < pp.readyAt) return;
   const wp = room.players[pp.winnerPid], lp = room.players[pp.weakestPid];
-  if(targetIndex < 0 || targetIndex >= lp.hand.length) targetIndex = Math.floor(Math.random()*lp.hand.length);
+  if(!wp || !lp){
+    log(room, '⚠️ ピック対象のプレイヤー情報が不正だったため、ピックを終了します。');
+    finishAfterPick(room, pp.winnerPid);
+    return;
+  }
+  if(lp.hand.length<=0){
+    log(room, '⚠️ 最弱プレイヤーの手札が空だったため、ピックなしで進行します。');
+    finishAfterPick(room, pp.winnerPid);
+    return;
+  }
+  if(targetIndex < 0 || targetIndex >= lp.hand.length || Number.isNaN(targetIndex)) targetIndex = Math.floor(Math.random()*lp.hand.length);
   const drawn = lp.hand.splice(targetIndex,1)[0];
+  if(!drawn){
+    log(room, '⚠️ ピックカード取得に失敗したため、ピックなしで進行します。');
+    finishAfterPick(room, pp.winnerPid);
+    return;
+  }
   let paired = null;
   if(!drawn.joker){
     const pi = wp.hand.findIndex(c=>!c.joker && c.rank===drawn.rank);
@@ -611,7 +734,9 @@ function finishAfterPick(room, winnerPid){
   if(!room.pendingPick && !room.trick.length) return;
   room.pendingPick=null;
   if(checkRoundEnd(room)) { broadcast(room); return; }
-  room.trick=[]; room.leadSuit=null; room.lead=winnerPid; room.current=winnerPid;
+  room.trick=[]; room.leadSuit=null;
+  if(!Number.isInteger(winnerPid) || winnerPid < 0 || winnerPid >= room.players.length) winnerPid = room.lead ?? 0;
+  room.lead=winnerPid; room.current=winnerPid;
   room.message = `${room.players[winnerPid].name} が次のリードです。`;
   broadcast(room);
 }
@@ -620,11 +745,26 @@ function checkRoundEnd(room){
   if(outPid<0) return false;
   const out = room.players[outPid];
   const onlyJoker = out.hand.length===1 && out.hand[0].joker;
+  clearAllProgressTimers(room);
+  room.pendingPick = null;
+  room.trickReview = null;
   if(room.round===1){
     room.round=2; room.trick=[]; room.leadSuit=null; room.lead=outPid; room.current=outPid;
     // 13枚まで補充。足りない場合は新しい通常山札を追加する簡易処理。
     let refill = makeDeck().filter(c=>!c.joker); shuffle(refill);
-    for(const p of room.players){ while(p.hand.length<13){ p.hand.push((room.stock.length?room.stock:refill).pop()); } sortHand(p.hand); }
+    const drawRefill = () => {
+      if(room.stock.length) return room.stock.pop();
+      if(!refill.length){ refill = makeDeck().filter(c=>!c.joker); shuffle(refill); }
+      return refill.pop();
+    };
+    for(const p of room.players){
+      while(p.hand.length<13){
+        const card = drawRefill();
+        if(card) p.hand.push(card);
+        else break;
+      }
+      sortHand(p.hand);
+    }
     room.message = onlyJoker
       ? `${out.name} の袋にババブタ1枚だけが残りました！第1ラウンド終了。残り手札を持ち越して13枚まで補充します。`
       : `${out.name} が上がり！第2ラウンドへ。残り手札を持ち越して13枚まで補充しました。`;
