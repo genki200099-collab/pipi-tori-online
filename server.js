@@ -123,6 +123,9 @@ function publicState(room, viewerId){
       winnerPid: room.pendingPick.winnerPid,
       weakestPid: room.pendingPick.weakestPid,
       readyAt: room.pendingPick.readyAt,
+      // クライアントのPC時計差に依存しないため、サーバー基準の状態も送る。
+      ready: Date.now() >= room.pendingPick.readyAt,
+      readyInMs: Math.max(0, room.pendingPick.readyAt - Date.now()),
       result: room.pendingPick.result || null
     } : null,
     players: room.players.map((p,i)=>({
@@ -308,7 +311,9 @@ function advanceReviewToPick(room, reviewToken, winnerPid, weakestPid){
     const line = cpuPickLine(room, winnerPid, weakestPid); if(line) say(room, winnerPid, line);
     ensureCpuPick(room);
     broadcast(room);
+    // readyAtを過ぎた状態を全員に再送する。Edge/PCのローカル時計差対策。
     setTimeout(()=>broadcast(room), 1850);
+    setTimeout(()=>broadcast(room), 2300);
   } else {
     finishAfterPick(room, winnerPid);
   }
@@ -356,6 +361,15 @@ function ensureRoomProgress(room){
   if(room.pendingPick && !room.pendingPick.result && room.players[room.pendingPick.winnerPid]?.cpu){
     ensureCpuPick(room);
     return;
+  }
+
+  // 人間のピック待ちでreadyAtを過ぎても画面が確認中のままにならないよう、状態を再送する。
+  if(room.pendingPick && !room.pendingPick.result && !room.players[room.pendingPick.winnerPid]?.cpu){
+    if(Date.now() >= room.pendingPick.readyAt && !room.pendingPick.readyBroadcasted){
+      room.pendingPick.readyBroadcasted = true;
+      broadcast(room);
+      return;
+    }
   }
 
   // レビュー画面で止まっている/タイマーが外れている場合は復旧。

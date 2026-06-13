@@ -263,7 +263,21 @@ function connect(after){
   const proto = location.protocol==='https:'?'wss':'ws';
   ws = new WebSocket(`${proto}://${location.host}`);
   ws.onopen=after;
-  ws.onmessage=e=>{ const msg=JSON.parse(e.data); if(msg.type==='created'||msg.type==='joined'){ myId=msg.playerId; $('roomInfo').style.display='block'; $('roomCode').textContent=msg.code; } if(msg.type==='state'){ state=msg.state; render(); } if(msg.type==='errorMsg') alert(msg.message); };
+  ws.onmessage=e=>{
+    const msg=JSON.parse(e.data);
+    if(msg.type==='created'||msg.type==='joined'){ myId=msg.playerId; $('roomInfo').style.display='block'; $('roomCode').textContent=msg.code; }
+    if(msg.type==='state'){
+      state=msg.state;
+      // サーバー基準の readyInMs から、クライアント側の疑似ready時刻を作る。
+      // PC Edgeのローカル時計差で「確認中…」から進まない問題を防ぐ。
+      if(state.pendingPick && !state.pendingPick.clientReadyAt){
+        const ms = Number(state.pendingPick.readyInMs ?? 0);
+        state.pendingPick.clientReadyAt = Date.now() + Math.max(0, ms);
+      }
+      render();
+    }
+    if(msg.type==='errorMsg') alert(msg.message);
+  };
   ws.onclose=()=>{ $('phase').textContent='切断'; };
 }
 function send(obj){ if(ws && ws.readyState===1) ws.send(JSON.stringify(obj)); }
@@ -277,6 +291,18 @@ function gridDisplayOrder(){ const cw=playersClockwise(); return cw.length===4 ?
 function nextPid(pid){ return state?.players?.length ? (pid+1)%state.players.length : pid; }
 function dirSymbol(pid){ return ({0:'→',1:'↓',2:'←',3:'↑'})[pid] || '→'; }
 function orderBadge(order){ return ['①','②','③','④'][order] || String(order+1); }
+function isPickReady(pp){
+  if(!pp || pp.result) return false;
+  if(pp.ready === true) return true;
+  if(typeof pp.readyInMs === 'number' && pp.readyInMs <= 0) return true;
+  if(pp.clientReadyAt && Date.now() >= pp.clientReadyAt) return true;
+  return false;
+}
+function pickRemainingSeconds(pp){
+  if(!pp || pp.result) return 0;
+  const base = pp.clientReadyAt || (Date.now() + Number(pp.readyInMs || 0));
+  return Math.max(0, Math.ceil((base - Date.now())/1000));
+}
 function render(){
   if(!state) return;
   $('roomInfo').style.display='block'; $('roomCode').textContent=state.code;
@@ -296,6 +322,21 @@ function render(){
       const el = document.getElementById('reviewSeconds');
       if(el){
         el.textContent = Math.max(0, Math.ceil((state.trickReview.until - Date.now())/1000));
+      }
+    }, 250);
+  }
+
+  // ピック確認中は、サーバー再送が遅れてもクライアント側でready表示へ切り替える。
+  // 場全体を更新する必要があるが、ピック専用画面のみなのでカードの小刻み再アニメ問題は起きにくい。
+  if(state.pendingPick && !state.pendingPick.result && !window.__pickReadyTimer){
+    window.__pickReadyTimer = setInterval(()=>{
+      if(!state || !state.pendingPick || state.pendingPick.result){
+        clearInterval(window.__pickReadyTimer); window.__pickReadyTimer=null;
+        return;
+      }
+      renderTable();
+      if(isPickReady(state.pendingPick)){
+        clearInterval(window.__pickReadyTimer); window.__pickReadyTimer=null;
       }
     }, 250);
   }
@@ -326,7 +367,8 @@ function renderTable(){
   const pp = state.pendingPick;
   if(pp){
     const w=state.players[pp.winnerPid], l=state.players[pp.weakestPid];
-    const ready=Date.now()>=pp.readyAt;
+    const ready=isPickReady(pp);
+    const waitSec=pickRemainingSeconds(pp);
     let html=`<div class="pick-stage">
       <h3>🐽 ババ抜きピック専用画面</h3>
       <div class="pick-main">
@@ -337,11 +379,11 @@ function renderTable(){
     if(pp.result){
       html += `<div class="pick-status">${esc(pp.result.text)}</div><div class="pick-result"><span>引いたカード</span>${cardHTML(pp.result.drawn,true)}</div>`;
     } else if(state.yourIndex===pp.winnerPid){
-      html += `<div class="pick-status">${ready?'最弱の袋から1枚タップしてピック！':'確認中…誰から引くかを確認しています。'}</div><div class="pick-hand">`;
+      html += `<div class="pick-status">${ready?'最弱の袋から1枚タップしてピック！':`確認中…あと${waitSec}秒でピックできます。`}</div><div class="pick-hand">`;
       for(let i=0;i<l.handCount;i++) html += `<button type="button" class="pick-card" ${ready?'':'disabled'} data-pick-index="${i}"><div class="playing-card back"></div></button>`;
       html += `</div>`;
     } else {
-      html += `<div class="pick-status">${ready?`${esc(w.name)} が ${esc(l.name)} の袋から選んでいます。`:`確認中… ${esc(w.name)} が ${esc(l.name)} から1枚ピックします。`}</div><div class="pick-hand">`;
+      html += `<div class="pick-status">${ready?`${esc(w.name)} が ${esc(l.name)} の袋から選んでいます。`:`確認中… ${esc(w.name)} が ${esc(l.name)} から1枚ピックします。あと${waitSec}秒`}</div><div class="pick-hand">`;
       for(let i=0;i<l.handCount;i++) html += `<div class="playing-card back"></div>`;
       html += `</div>`;
     }
