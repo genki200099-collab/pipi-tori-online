@@ -139,6 +139,8 @@ function publicState(room, viewerId){
     yourIndex: viewerIndex,
     phase: room.phase,
     round: room.round,
+    roundStart: room.roundStart && room.roundStart.expiresAt > Date.now() ? room.roundStart : null,
+    roundEndSummary: room.roundEndSummary || null,
     lead: room.lead,
     current: room.current,
     leadSuit: room.leadSuit,
@@ -173,7 +175,11 @@ function publicState(room, viewerId){
     log: room.log,
   };
 }
-function send(ws, type, payload){ if(ws.readyState===WebSocket.OPEN) ws.send(JSON.stringify({type, ...payload})); }
+function send(ws, type, payload){
+  if(!ws || ws.readyState!==WebSocket.OPEN) return;
+  try { ws.send(JSON.stringify({type, ...payload})); }
+  catch(e){ console.error('send failed', e); }
+}
 function broadcast(room){
   if(!room || !room.players) return;
   for(const p of room.players){
@@ -595,6 +601,8 @@ function startGame(room, requesterId){
   if(room.players.length !== 4) { room.message='4人そろうと開始できます。足りない席はCPUを追加してください。'; broadcast(room); return; }
   clearAllProgressTimers(room);
   room.phase='playing'; room.round=1; room.lead=Math.floor(Math.random()*4); room.current=room.lead; room.trick=[]; room.leadSuit=null; room.pendingPick=null; room.trickReview=null; room.stock=[];
+  room.roundEndSummary=null; room.finalRoundSummary=null; room.roundEndOutPid=null;
+  room.roundStart = {round:1, text:'第1ラウンド開始！ぶひぶひ収穫祭スタート。', expiresAt:Date.now()+6500};
   room.lastHumanTurnRebroadcastAt = 0; room.lastNoPlayableRebroadcastAt = 0;
   for(const p of room.players){ p.hand=[]; p.scorePile=[]; p.pairs=[]; p.out=false; p.final=null; }
   dealInitial(room);
@@ -620,21 +628,29 @@ function playableIds(room, pid){
   if(Number(room.current) !== pid) return new Set();
 
   // ババブタは場に出せない。通常カードがない場合は出せるカードなし。
-  const nonJoker = p.hand.filter(c=>!c.joker);
+  const nonJoker = p.hand.filter(c=>c && !c.joker);
   if(!nonJoker.length) return new Set();
 
   // リードスート未設定＝トリック先頭。通常カードなら何でも出せる。
   if(!room.leadSuit) return new Set(nonJoker.map(c=>c.id));
 
   // マストフォロー。
-  const follow = p.hand.filter(c=>!c.joker && c.suit===room.leadSuit);
+  const follow = p.hand.filter(c=>c && !c.joker && c.suit===room.leadSuit);
   return new Set((follow.length ? follow : nonJoker).map(c=>c.id));
 }
 function playCard(room, playerId, cardId){
   const pid = room.players.findIndex(p=>p.id===playerId);
   const allowed = playableIds(room, pid);
   if(!allowed.has(cardId)) { room.message='そのカードは出せません。マストフォロー、またはババブタ不可を確認！'; broadcast(room); return; }
-  const p = room.players[pid]; const idx = p.hand.findIndex(c=>c.id===cardId); const card = p.hand.splice(idx,1)[0];
+  const p = room.players[pid];
+  const idx = p.hand.findIndex(c=>c && c.id===cardId);
+  if(idx < 0){
+    room.message='そのカードは手札に見つかりません。画面を更新します。';
+    log(room, `⚠️ ${p.name} が存在しないカードを出そうとしたため、状態を再送しました。`);
+    broadcast(room);
+    return;
+  }
+  const card = p.hand.splice(idx,1)[0];
   room.lastHumanTurnRebroadcastAt = 0;
   if(!room.leadSuit) room.leadSuit = card.suit;
   room.trick.push({pid, card, order:room.trick.length});
@@ -740,46 +756,109 @@ function finishAfterPick(room, winnerPid){
   room.message = `${room.players[winnerPid].name} が次のリードです。`;
   broadcast(room);
 }
+
+function makeRoundSnapshot(room, reasonPid, reasonText){
+  const rows = room.players.map((p,i)=>({
+    pid:i,
+    name:p.name,
+    handCount:p.hand.length,
+    normalHand:p.hand.filter(c=>c && !c.joker).length,
+    hasJoker:p.hand.some(c=>c && c.joker),
+    pile:p.scorePile.length,
+    pairs:Math.floor(p.pairs.length/2),
+    madPig:[...p.hand, ...p.scorePile].filter(c=>c && !c.joker && c.suit==='♠' && c.rank==='Q').length,
+  }));
+  return {
+    round: room.round,
+    reasonPid,
+    reasonName: room.players[reasonPid]?.name || '',
+    reasonText,
+    rows,
+    createdAt: Date.now()
+  };
+}
+
+function beginRound2(room){
+  if(!room || room.phase !== 'roundEnd') return;
+  clearAllProgressTimers(room);
+
+  const outPid = Number.isInteger(room.roundEndOutPid) ? room.roundEndOutPid : 0;
+  room.round = 2;
+  room.phase = 'playing';
+  room.trick = [];
+  room.leadSuit = null;
+  room.pendingPick = null;
+  room.trickReview = null;
+  room.roundEndSummary = null;
+  room.roundEndOutPid = null;
+  room.lead = outPid;
+  room.current = outPid;
+  room.lastHumanTurnRebroadcastAt = 0;
+  room.lastNoPlayableRebroadcastAt = 0;
+  room.roundStart = {round:2, text:'第2ラウンド開始！残り手札を持ち越して、13枚まで補充しました。', expiresAt:Date.now()+6500};
+
+  let refill = makeDeck().filter(c=>!c.joker); shuffle(refill);
+  const drawRefill = () => {
+    if(room.stock.length) return room.stock.pop();
+    if(!refill.length){ refill = makeDeck().filter(c=>!c.joker); shuffle(refill); }
+    return refill.pop();
+  };
+  for(const p of room.players){
+    while(p.hand.length<13){
+      const card = drawRefill();
+      if(card) p.hand.push(card);
+      else break;
+    }
+    sortHand(p.hand);
+  }
+  room.message=`第2ラウンド開始。${room.players[room.current].name} からリード。`;
+  log(room, room.message);
+  broadcast(room);
+}
+
 function checkRoundEnd(room){
-  const outPid = room.players.findIndex(p=>p.hand.length===0 || (p.hand.length===1 && p.hand[0].joker));
+  const outPid = room.players.findIndex(isRoundEndHand);
   if(outPid<0) return false;
+
   const out = room.players[outPid];
   const onlyJoker = out.hand.length===1 && out.hand[0].joker;
   clearAllProgressTimers(room);
   room.pendingPick = null;
   room.trickReview = null;
+  room.trick = [];
+  room.leadSuit = null;
+
+  const reasonText = onlyJoker
+    ? `${out.name} の袋にババブタ1枚だけが残りました。`
+    : `${out.name} の手札がなくなりました。`;
+
+  // どのラウンドでも終了時点の状況を保存する。
+  // 第1ラウンド: roundEndSummaryをモーダル表示し、OKで第2ラウンドへ。
+  // 第2ラウンド: finalRoundSummaryとして最終結果画面の前段にも使えるよう保持。
+  const snapshot = makeRoundSnapshot(room, outPid, reasonText);
+  room.roundEndOutPid = outPid;
+
   if(room.round===1){
-    room.round=2; room.trick=[]; room.leadSuit=null; room.lead=outPid; room.current=outPid;
-    // 13枚まで補充。足りない場合は新しい通常山札を追加する簡易処理。
-    let refill = makeDeck().filter(c=>!c.joker); shuffle(refill);
-    const drawRefill = () => {
-      if(room.stock.length) return room.stock.pop();
-      if(!refill.length){ refill = makeDeck().filter(c=>!c.joker); shuffle(refill); }
-      return refill.pop();
-    };
-    for(const p of room.players){
-      while(p.hand.length<13){
-        const card = drawRefill();
-        if(card) p.hand.push(card);
-        else break;
-      }
-      sortHand(p.hand);
-    }
-    room.message = onlyJoker
-      ? `${out.name} の袋にババブタ1枚だけが残りました！第1ラウンド終了。残り手札を持ち越して13枚まで補充します。`
-      : `${out.name} が上がり！第2ラウンドへ。残り手札を持ち越して13枚まで補充しました。`;
-    if(out.cpu) say(room, outPid, sample(['上がりブヒ！後半もこの調子でいくブヒ！','まずは抜けたブヒ！でも後半があるブヒ。']));
+    room.roundEndSummary = snapshot;
+    room.phase='roundEnd';
+    room.current=null;
+    room.message=`第1ラウンド終了！結果を確認してOKを押すと第2ラウンドへ進みます。`;
     log(room, room.message);
   } else {
+    room.finalRoundSummary = snapshot;
+    room.roundEndSummary = null;
     room.phase='finished';
+    room.current=null;
     room.message = onlyJoker
       ? `${out.name} の袋にババブタ1枚だけが残りました！ゲーム終了。`
       : `${out.name} が上がり！ゲーム終了。`;
     if(out.cpu) say(room, outPid, onlyJoker ? sample(['ババブタだけ残ったブヒ…終わったブヒ…','袋の中がババブタだけブヒ！？']) : sample(['上がり！ごちそう山を数えるブヒ！','決着ブヒ！点数計算だブヒ！']));
-    log(room, room.message); score(room);
+    log(room, room.message);
+    score(room);
   }
   return true;
 }
+
 function score(room){
   for(const p of room.players){
     const pile = p.scorePile.length;
@@ -802,6 +881,12 @@ wss.on('connection', (ws) => {
     if(msg.type==='removeCpu') removeCpu(room, ws.playerId);
     if(msg.type==='play') playCard(room, ws.playerId, msg.cardId);
     if(msg.type==='pick') doPick(room, ws.playerId, Number(msg.index));
+    if(msg.type==='continueRound') {
+      if(room.phase === 'roundEnd'){
+        log(room, 'ラウンド結果確認OK。第2ラウンドへ進みます。');
+        beginRound2(room);
+      }
+    }
   });
   ws.on('close', () => {
     const room = roomByWs(ws); if(!room) return;

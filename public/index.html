@@ -18,10 +18,36 @@ h2{margin:0 0 10px}.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.
 .table-commentary-text{font-size:13px;font-weight:900;color:#82302d;line-height:1.45}
 .table-commentary-text b{color:#b64040}
 @keyframes commentSlide{from{transform:translateY(-6px);opacity:.15}to{transform:translateY(0);opacity:1}}
-.table-wrap{position:relative}.table{background:radial-gradient(circle,#fff8e8,#ffe8d8);border:2px dashed #efb3a4;border-radius:18px;padding:10px;min-height:138px}.turn-order-bar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;justify-content:center;margin-bottom:10px;background:#fff8ef;border:2px solid #f0cfb3;border-radius:14px;padding:8px 10px;font-weight:900}.turn-order-bar .ord{padding:6px 10px;border-radius:999px;background:#fff;border:2px solid #efceb1}.turn-order-bar .ord.current{background:#fff1cf;border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,165,54,.18)}.turn-order-bar .ord.done{background:#eef8ef;border-color:#b7d8b7}.turn-order-bar .arrowtxt{color:#aa6d5c;font-weight:900}.table-board{display:grid;grid-template-columns:1fr 124px 1fr;grid-template-areas:'p0 mid p1' 'p3 mid p2';gap:14px;align-items:stretch}.seat{border:2px dashed #e4b09b;border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:6px;min-height:180px;background:rgba(255,255,255,.55);transition:.2s;position:relative;padding:12px 10px 14px}.seat.win{border-color:var(--gold);background:#fff7d7;box-shadow:0 0 0 3px rgba(212,165,54,.25)}.seat.weak{border-color:#8752b3;background:#f5edff;box-shadow:0 0 0 3px rgba(120,80,170,.18)}.seat.current{box-shadow:0 0 0 4px rgba(212,165,54,.28),0 10px 18px rgba(212,165,54,.16)}.seat-0{grid-area:p0}.seat-1{grid-area:p1}.seat-2{grid-area:p2}.seat-3{grid-area:p3}.seat .mini-card{transform:scale(1.08);transform-origin:center top}.seat .play-badge{position:absolute;top:8px;left:8px;background:linear-gradient(135deg,#b64040,#8c2525);color:#fff;border-radius:999px;padding:2px 7px;font-size:11px;font-weight:900}.seat .turn-flag{position:absolute;top:8px;right:8px;background:#fff0bd;color:#7a4b00;border:2px solid #efcf7e;border-radius:999px;padding:2px 7px;font-size:11px;font-weight:900;animation:pulse 1s infinite alternate}.seat .seat-arrow{position:absolute;display:flex;align-items:center;gap:4px;background:#fff;border:2px solid #efceb1;border-radius:999px;padding:4px 8px;font-weight:900;color:#8c503e;box-shadow:0 3px 8px rgba(0,0,0,.08)}.seat .seat-arrow.current-next{background:#fff1cf;border-color:var(--gold);color:#7a4b00}.seat-0 .seat-arrow{right:-24px;top:50%;transform:translateY(-50%)}.seat-1 .seat-arrow{left:50%;bottom:-22px;transform:translateX(-50%)}.seat-2 .seat-arrow{left:-24px;top:50%;transform:translateY(-50%)}.seat-3 .seat-arrow{left:50%;top:-22px;transform:translateX(-50%)}.center-wheel{grid-area:mid;align-self:center;justify-self:center;width:118px;height:118px;border-radius:50%;background:linear-gradient(135deg,#fffef8,#ffeecf);border:3px solid #e9c076;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-weight:900;color:#7a4b00;box-shadow:0 10px 18px rgba(212,165,54,.18)}.center-wheel .cw-arrow{font-size:28px;line-height:1}.center-wheel .cw-small{font-size:12px;color:#8c503e}.result-banner{margin-bottom:10px;background:#fff;border:2px solid #e9aa84;border-radius:16px;padding:10px;font-weight:900;display:grid;grid-template-columns:1fr 1fr;gap:8px}.result-banner span{display:block;background:#fff7ed;border-radius:12px;padding:8px}.review-banner{margin:8px 0 10px;background:linear-gradient(135deg,#fff8d2,#ffe6c7);border:3px solid #d4a536;border-radius:16px;padding:10px;text-align:center;font-weight:900;color:#7a4b00;box-shadow:0 0 0 4px rgba(212,165,54,.14);animation:reviewPulse 1s infinite alternate}.review-banner b{font-size:20px;color:#b64040}@keyframes reviewPulse{from{filter:brightness(1)}to{filter:brightness(1.07)}}.who{font-size:12px;font-weight:900;color:#8c503e}.hand-note{margin:0 0 10px;background:linear-gradient(135deg,#f7ffe9,#eef8d8);border:2px solid #b8d18b;border-radius:14px;padding:10px 12px;color:#36511f;font-weight:900;line-height:1.5;writing-mode:horizontal-tb;text-orientation:mixed;display:block;width:100%;box-sizing:border-box}
+.table-wrap{position:relative}.table{background:radial-gradient(circle,#fff8e8,#ffe8d8);border:2px dashed #efb3a4;border-radius:18px;padding:10px;min-height:138px}.turn-order-bar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;justify-content:center;margin-bottom:10px;background:#fff8ef;border:2px solid #f0cfb3;border-radius:14px;padding:8px 10px;font-weight:900}.turn-order-bar .ord{padding:6px 10px;border-radius:999px;background:#fff;border:2px solid #efceb1}.turn-order-bar .ord.current{background:#fff1cf;border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,165,54,.18)}.turn-order-bar .ord.done{background:#eef8ef;border-color:#b7d8b7}.turn-order-bar .arrowtxt{color:#aa6d5c;font-weight:900}.table-board{display:grid;grid-template-columns:1fr 124px 1fr;grid-template-areas:'p0 mid p1' 'p3 mid p2';gap:14px;align-items:stretch}.seat{border:2px dashed #e4b09b;border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:6px;min-height:180px;background:rgba(255,255,255,.55);transition:.2s;position:relative;padding:12px 10px 14px}.seat.win{border-color:var(--gold);background:#fff7d7;box-shadow:0 0 0 3px rgba(212,165,54,.25)}.seat.weak{border-color:#8752b3;background:#f5edff;box-shadow:0 0 0 3px rgba(120,80,170,.18)}.seat.current{box-shadow:0 0 0 4px rgba(212,165,54,.28),0 10px 18px rgba(212,165,54,.16)}.seat-0{grid-area:p0}.seat-1{grid-area:p1}.seat-2{grid-area:p2}.seat-3{grid-area:p3}.seat .mini-card{transform:scale(1.08);transform-origin:center top}.seat .play-badge{position:absolute;top:8px;left:8px;background:linear-gradient(135deg,#b64040,#8c2525);color:#fff;border-radius:999px;padding:2px 7px;font-size:11px;font-weight:900}.seat .turn-flag{position:absolute;top:8px;right:8px;background:#fff0bd;color:#7a4b00;border:2px solid #efcf7e;border-radius:999px;padding:2px 7px;font-size:11px;font-weight:900;animation:pulse 1s infinite alternate}.seat .seat-arrow{position:absolute;display:flex;align-items:center;gap:4px;background:#fff;border:2px solid #efceb1;border-radius:999px;padding:4px 8px;font-weight:900;color:#8c503e;box-shadow:0 3px 8px rgba(0,0,0,.08)}.seat .seat-arrow.current-next{background:#fff1cf;border-color:var(--gold);color:#7a4b00}.seat-0 .seat-arrow{right:-24px;top:50%;transform:translateY(-50%)}.seat-1 .seat-arrow{left:50%;bottom:-22px;transform:translateX(-50%)}.seat-2 .seat-arrow{left:-24px;top:50%;transform:translateY(-50%)}.seat-3 .seat-arrow{left:50%;top:-22px;transform:translateX(-50%)}.center-wheel{grid-area:mid;align-self:center;justify-self:center;width:118px;height:118px;border-radius:50%;background:linear-gradient(135deg,#fffef8,#ffeecf);border:3px solid #e9c076;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-weight:900;color:#7a4b00;box-shadow:0 10px 18px rgba(212,165,54,.18)}.center-wheel .cw-arrow{font-size:28px;line-height:1}.center-wheel .cw-small{font-size:12px;color:#8c503e}.result-banner{margin-bottom:10px;background:#fff;border:2px solid #e9aa84;border-radius:16px;padding:10px;font-weight:900;display:grid;grid-template-columns:1fr 1fr;gap:8px}.result-banner span{display:block;background:#fff7ed;border-radius:12px;padding:8px}.review-banner{margin:8px 0 10px;background:linear-gradient(135deg,#fff8d2,#ffe6c7);border:3px solid #d4a536;border-radius:16px;padding:10px;text-align:center;font-weight:900;color:#7a4b00;box-shadow:0 0 0 4px rgba(212,165,54,.14);animation:reviewPulse 1s infinite alternate}.review-banner b{font-size:20px;color:#b64040}@keyframes reviewPulse{from{filter:brightness(1)}to{filter:brightness(1.07)}}.who{font-size:12px;font-weight:900;color:#8c503e}.round-status{margin-top:10px;background:linear-gradient(135deg,#fff6d8,#ffe8ec);border:3px solid #e0b04f;border-radius:18px;padding:10px;text-align:center;font-weight:900;color:#7a4b00;box-shadow:0 5px 14px rgba(112,61,23,.12)}
+.round-status .round-big{font-size:24px;color:#b64040}
+.round-start{margin:10px 0;background:linear-gradient(135deg,#fff,#fff2c6);border:3px solid #d4a536;border-radius:20px;padding:14px;text-align:center;font-weight:900;color:#7a4b00;animation:roundPop .9s ease-out}
+.round-start .round-title{font-size:26px;color:#b64040}
+@keyframes roundPop{from{transform:scale(.96);opacity:.15}to{transform:scale(1);opacity:1}}
+.round-modal{position:fixed;inset:0;background:rgba(42,24,16,.46);z-index:100;display:flex;align-items:center;justify-content:center;padding:14px}
+.round-panel{max-width:760px;width:100%;max-height:88vh;overflow:auto;background:radial-gradient(circle at 50% 0,#fffdf4,#ffe8d8);border:4px solid #d4a536;border-radius:26px;padding:16px;box-shadow:0 18px 50px rgba(0,0,0,.26)}
+.round-panel h2{font-size:28px;color:#b64040;text-align:center;margin:0 0 8px}
+.round-reason{background:#fff3c9;border-left:7px solid #d4a536;border-radius:14px;padding:10px;margin:10px 0;font-weight:900;color:#70461d}
+.round-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.round-card{background:#fff;border:2px solid #efc5a5;border-radius:16px;padding:10px;text-align:center;box-shadow:0 5px 12px rgba(66,36,20,.08)}
+.round-card.highlight{border-color:#b64040;background:#fff0f0;box-shadow:0 0 0 3px rgba(182,64,64,.12)}
+.round-card .name{font-weight:900;color:#7a332b}
+.round-card .stat{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed #efd0b4;padding:3px 0;font-size:12px}
+.round-card .stat:last-child{border-bottom:none}
+.round-danger{display:inline-block;margin-top:5px;background:#ffe7ee;border:2px solid #d45c7a;color:#8b1f3b;border-radius:999px;padding:2px 8px;font-size:12px;font-weight:900}
+.round-actions{margin-top:14px;text-align:center}
+.round-actions .btn{min-width:220px}
+@media(max-width:650px){.round-grid{grid-template-columns:1fr 1fr}.round-panel h2{font-size:22px}.round-actions .btn{width:100%}}.hand-note{margin:0;background:linear-gradient(135deg,#f7ffe9,#eef8d8);border:2px solid #b8d18b;border-radius:14px;padding:10px 12px;color:#36511f;font-weight:900;line-height:1.55;writing-mode:horizontal-tb;text-orientation:mixed;display:block;width:100%;max-width:100%;box-sizing:border-box;white-space:normal}
 .hand-note strong{color:#6a4a00}
-.hand-wrap{display:block}
-.hand{display:flex;gap:8px;overflow-x:auto;padding:14px 2px 10px;min-height:142px}
+.hand-wrap{display:flex;flex-direction:column;gap:10px;width:100%;min-width:0}
+.hand-alerts{display:grid;gap:8px;width:100%;min-width:0}
+.notice{display:block;width:100%;max-width:100%;padding:12px 14px;border-radius:14px;font-weight:900;line-height:1.55;white-space:normal;word-break:break-word;writing-mode:horizontal-tb;text-orientation:mixed;box-sizing:border-box}
+.notice-title{display:flex;align-items:center;gap:8px;margin-bottom:4px;font-size:14px}
+.notice-body{font-size:14px}
+.notice.info{background:linear-gradient(135deg,#f7ffe9,#eef8d8);border:2px solid #b8d18b;color:#36511f}
+.notice.warning{background:linear-gradient(135deg,#fff0f3,#ffe0e7);border:2px solid #e3a0af;color:#7a213e}
+.notice.warning .notice-title{color:#b52852}
+.notice.subtle{background:#fff8ef;border:2px solid #efd0b4;color:#7a4b35}
+.hand{display:flex;gap:8px;overflow-x:auto;padding:6px 2px 10px;min-height:142px;scrollbar-gutter:stable}
 .hand-card{border:none;background:transparent;padding:0;margin:0;display:block;touch-action:manipulation;-webkit-user-select:none;user-select:none}
 .hand-card:not(:disabled){cursor:pointer}
 .hand-card:disabled{cursor:not-allowed}
@@ -150,15 +176,16 @@ h2{margin:0 0 10px}.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.
 
   <section class="cardbox">
     <div class="status"><div>状態<b id="phase">未接続</b></div><div>ラウンド<b id="round">-</b></div><div>手番<b id="turn">-</b></div><div>リード<b id="lead">-</b></div></div>
+    <div id="roundStatus" class="round-status"></div>
   </section>
 
   <section class="cardbox"><h2>プレイヤー</h2><div id="players" class="players"></div></section>
 
-  <section class="cardbox"><h2>場のカード</h2><div id="tableCommentary"></div><div id="lastTrick"></div><div id="table" class="table"></div><div id="message" class="message">部屋を作るか、部屋コードで参加してください。</div><div class="tip">出せるカードは手札の上に少し浮きます。ピック中は中央にババ抜き画面が出ます。</div></section>
+  <section class="cardbox"><h2>場のカード</h2><div id="tableCommentary"></div><div id="lastTrick"></div><div id="table" class="table"></div><div id="message" class="message">部屋を作るか、部屋コードで参加してください。</div><div class="tip">出せるカードは手札で少し浮いて見えます。ピック中は中央に専用のババ抜き画面が表示されます。</div></section>
 
   <section id="pickBox" class="cardbox pick" style="display:none"></section>
 
-  <section class="cardbox"><h2>あなたの手札</h2><div class="hand-wrap"><div id="handNote"></div><div id="hand" class="hand"></div></div></section>
+  <section class="cardbox"><h2>あなたの手札</h2><div class="hand-wrap"><div id="handNote"></div><div id="handAlerts"></div><div id="hand" class="hand"></div></div></section>
 
   <section class="cardbox"><h2>進行ログ</h2><div id="log" class="log"></div></section>
 
@@ -218,6 +245,7 @@ h2{margin:0 0 10px}.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.
 
   <section id="scoreBox" class="cardbox" style="display:none"><h2>最終結果</h2><div id="score"></div></section>
 </div>
+<div id="roundModal"></div>
 <script>
 'use strict';
 let ws, state=null, myId=null;
@@ -316,13 +344,13 @@ function pickRemainingSeconds(pp){
 function render(){
   if(!state) return;
   $('roomInfo').style.display='block'; $('roomCode').textContent=state.code;
-  $('phase').textContent = state.phase==='lobby'?'ロビー':state.phase==='playing'?'対戦中':state.phase==='finished'?'終了':'-';
+  $('phase').textContent = state.phase==='lobby'?'ロビー':state.phase==='playing'?'対戦中':state.phase==='roundEnd'?'ラウンド結果確認':state.phase==='finished'?'終了':'-';
   $('round').textContent=state.round||'-'; $('turn').textContent=state.current!=null?playerName(state.current):'-'; $('lead').textContent=state.lead!=null?playerName(state.lead):'-';
   $('message').textContent=state.message||'';
   $('start').disabled = !(isHost() && state.phase==='lobby' && state.players.length===4);
   $('addCpu').disabled = !(isHost() && state.phase==='lobby' && state.players.length<4);
   $('removeCpu').disabled = !(isHost() && state.phase==='lobby' && state.players.some(p=>p.cpu));
-  renderCommentary(); renderPlayers(); renderLastTrick(); renderTable(); renderHand(); renderPick(); renderLog(); renderScore();
+  renderRoundStatus(); renderRoundModal(); renderCommentary(); renderPlayers(); renderLastTrick(); renderTable(); renderHand(); renderPick(); renderLog(); renderScore();
   if(state.trickReview && state.trickReview.until > Date.now() && !window.__reviewTimer){
     window.__reviewTimer = setInterval(()=>{
       if(!state || !state.trickReview || state.trickReview.until <= Date.now()){
@@ -351,6 +379,53 @@ function render(){
     }, 250);
   }
 }
+function renderRoundStatus(){
+  const el=$('roundStatus');
+  if(!el || !state){ return; }
+  const label = state.phase==='roundEnd'
+    ? `第${state.round}ラウンド終了・結果確認中`
+    : state.phase==='finished'
+      ? 'ゲーム終了'
+      : state.round ? `現在：第${state.round}ラウンド` : '開始前';
+  const start = state.roundStart ? `<div class="round-start"><div class="round-title">🐷 第${state.roundStart.round}ラウンド開始！</div><div>${esc(state.roundStart.text)}</div></div>` : '';
+  el.innerHTML = `<div class="round-big">${esc(label)}</div>${start}`;
+}
+
+function renderRoundModal(){
+  const el=$('roundModal');
+  if(!el || !state) return;
+  const sum = state.roundEndSummary;
+
+  // 第1ラウンド終了時だけ表示。OKで第2ラウンドへ。
+  if(state.phase !== 'roundEnd' || !sum){
+    el.innerHTML='';
+    return;
+  }
+
+  const rows = (sum.rows||[]).map(r=>`
+    <div class="round-card ${r.pid===sum.reasonPid?'highlight':''}">
+      <div class="name">${r.pid===sum.reasonPid?'🏁 ':''}${esc(r.name)}</div>
+      <div class="stat"><span>ごちそう山</span><b>${r.pile}枚</b></div>
+      <div class="stat"><span>残り通常手札</span><b>${r.normalHand}枚</b></div>
+      <div class="stat"><span>ペア浄化</span><b>${r.pairs}組</b></div>
+      <div class="stat"><span>マッド・ピッグ</span><b>${r.madPig}枚</b></div>
+      ${r.hasJoker?'<span class="round-danger">🃏 ババブタ保持</span>':''}
+    </div>
+  `).join('');
+
+  el.innerHTML = `<div class="round-modal">
+    <div class="round-panel">
+      <h2>🐷 第1ラウンド結果</h2>
+      <div class="round-reason">${esc(sum.reasonText)}</div>
+      <div class="round-grid">${rows}</div>
+      <div class="round-actions">
+        <button type="button" class="btn" onclick="this.disabled=true; this.textContent='第2ラウンド準備中…'; continueRound()">OK：第2ラウンドへ進む</button>
+      </div>
+      <p class="small" style="text-align:center;margin-top:8px">この画面は第1ラウンド終了時に表示されます。誰かがOKを押すと全員が第2ラウンドへ進みます。</p>
+    </div>
+  </div>`;
+}
+
 function renderCommentary(){
   const el=$('tableCommentary');
   if(!el) return;
@@ -447,22 +522,40 @@ function renderHand(){
   const playableSet = new Set(state?.playableCardIds || []);
   let note = '';
   if(state?.phase === 'playing' && state?.isYourTurn && playableSet.size === 0){
-    note = '<div class="hand-note">現在あなたの手番ですが、<strong>出せる通常カードがありません</strong>。ババブタだけの場合はラウンド終了処理を待っています。</div>';
+    note = `<div class="notice info">
+      <div class="notice-title">👀 手番のお知らせ</div>
+      <div class="notice-body">現在あなたの手番ですが、<strong>出せる通常カードがありません</strong>。ババブタだけの場合はラウンド終了処理を待っています。</div>
+    </div>`;
   } else if(state?.phase === 'playing' && state?.isYourTurn){
-    note = '<div class="hand-note">あなたの手番です。<strong>光っているカード</strong>を選んでください。</div>';
+    note = `<div class="notice info">
+      <div class="notice-title">👉 あなたの手番です</div>
+      <div class="notice-body"><strong>光っているカード</strong>を選んでください。</div>
+    </div>`;
   }
   $('handNote').innerHTML = note;
 
-  const madPigNotice = hand.some(isMadPig)
-    ? '<div class="message">☠️🐷 スペードQは <b>マッド・ピッグ</b>。最終的に持つと <b>-13点</b> の恐ろしいカードです。</div>'
-    : '';
+  const alerts = [];
+  if(hand.some(isMadPig)){
+    alerts.push(`<div class="notice warning">
+      <div class="notice-title">☠️ マッド・ピッグ警告</div>
+      <div class="notice-body">スペードQは <strong>マッド・ピッグ</strong>。最終的に持っていると <strong>-13点</strong> の失点になります。</div>
+    </div>`);
+  }
+  if(state?.phase === 'roundEnd'){
+    alerts.push(`<div class="notice subtle">
+      <div class="notice-title">🐷 ラウンド結果確認中</div>
+      <div class="notice-body">第1ラウンドの結果を確認しています。<strong>OK</strong> が押されると第2ラウンドへ進みます。</div>
+    </div>`);
+  }
+  $('handAlerts').className = alerts.length ? 'hand-alerts' : '';
+  $('handAlerts').innerHTML = alerts.join('');
 
   const cards = hand.map(c=>{
     const can = playableSet.has(c.id);
     return `<button type="button" class="hand-card ${can?'':'un'}" ${can?'': 'disabled'} data-card-id="${escAttr(c.id)}">${cardHTML(c, can)}</button>`;
   }).join('') || '<p class="small">手札はまだありません。</p>';
 
-  $('hand').innerHTML = madPigNotice + cards;
+  $('hand').innerHTML = cards;
 }
 function requestPlay(id){
   if(!ws || ws.readyState!==1){
@@ -480,6 +573,14 @@ function requestPick(i){
   send({type:'pick', index:Number(i)});
 }
 window.pick = requestPick;
+function continueRound(){
+  if(!ws || ws.readyState!==1){
+    $('message').textContent = '通信が切れています。ページを再読み込みして再参加してください。';
+    return;
+  }
+  send({type:'continueRound'});
+}
+window.continueRound = continueRound;
 function renderPick(){
   // ピック中は「場のカード」エリア自体を専用レイアウトへ切り替えるため、
   // 旧ピックBoxは重複表示しない。
@@ -529,6 +630,8 @@ function renderScore(){
   const rows=sorted.map((p,idx)=>`<tr><td>${medal[idx]} ${rankLabel[idx]}</td><td>${esc(p.name)}</td><td>${p.final.pile}</td><td>-${p.final.normalHand*3}</td><td>-${p.final.madPig*13}</td><td>-${p.final.joker*20}</td><td><b>${p.final.total}</b></td></tr>`).join('');
 
   const last = sorted[sorted.length-1];
+  const finalReason = state.finalRoundSummary ? `<div class="final-comment"><b>第2ラウンド終了理由：</b>${esc(state.finalRoundSummary.reasonText)}</div>` : '';
+
   const comment = win.final.total===last.final.total
     ? '全員同点！これはもう全員でブヒブヒ拍手です。'
     : `${esc(win.name)} がごちそうを一番うまく集めました！ ${esc(last.name)} はババブタと次回リベンジ。`;
@@ -542,7 +645,7 @@ function renderScore(){
         <div class="winner-score">${win.final.total} 点</div>
       </div>
       <div class="podium">${podium}</div>
-      <div class="final-comment">${comment}</div>
+      ${finalReason}<div class="final-comment">${comment}</div>
       <h3 style="margin:14px 0 6px;color:#b64040">得点内訳</h3>
       <div class="final-breakdown">${breakdown}</div>
       <div class="score-compact">
