@@ -758,16 +758,32 @@ function finishAfterPick(room, winnerPid){
 }
 
 function makeRoundSnapshot(room, reasonPid, reasonText){
-  const rows = room.players.map((p,i)=>({
-    pid:i,
-    name:p.name,
-    handCount:p.hand.length,
-    normalHand:p.hand.filter(c=>c && !c.joker).length,
-    hasJoker:p.hand.some(c=>c && c.joker),
-    pile:p.scorePile.length,
-    pairs:Math.floor(p.pairs.length/2),
-    madPig:[...p.hand, ...p.scorePile].filter(c=>c && !c.joker && c.suit==='♠' && c.rank==='Q').length,
-  }));
+  const rows = room.players.map((p,i)=>{
+    const pile = p.scorePile.length;
+    const normalHand = p.hand.filter(c=>c && !c.joker).length;
+    const hasJoker = p.hand.some(c=>c && c.joker);
+    const madPig = [...p.hand, ...p.scorePile].filter(c=>c && !c.joker && c.suit==='♠' && c.rank==='Q').length;
+    const jokerPenalty = hasJoker ? 20 : 0;
+    const madPigPenalty = madPig * 13;
+    const handPenalty = normalHand * 3;
+    // マッド・ピッグは得点パイルにあっても +1点を数えたうえで追加 -13点。
+    const total = pile - handPenalty - madPigPenalty - jokerPenalty;
+    return {
+      pid:i,
+      name:p.name,
+      handCount:p.hand.length,
+      normalHand,
+      hasJoker,
+      pile,
+      pairs:Math.floor(p.pairs.length/2),
+      madPig,
+      pileScore:pile,
+      handPenalty,
+      madPigPenalty,
+      jokerPenalty,
+      total
+    };
+  });
   return {
     round: room.round,
     reasonPid,
@@ -862,9 +878,11 @@ function checkRoundEnd(room){
 function score(room){
   for(const p of room.players){
     const pile = p.scorePile.length;
-    const normalHand = p.hand.filter(c=>!c.joker).length;
-    const madPig = [...p.hand, ...p.scorePile].filter(c=>!c.joker && c.suit==='♠' && c.rank==='Q').length;
-    const joker = p.hand.some(c=>c.joker) ? 1 : 0;
+    const normalHand = p.hand.filter(c=>c && !c.joker).length;
+    // マッド・ピッグ（スペードQ）は、手札・得点パイルのどちらにあっても追加 -13点。
+    // 得点パイルにある場合は、そのカード自身の +1点を数えたうえで追加失点を受ける。
+    const madPig = [...p.hand, ...p.scorePile].filter(c=>c && !c.joker && c.suit==='♠' && c.rank==='Q').length;
+    const joker = p.hand.some(c=>c && c.joker) ? 1 : 0;
     const total = pile - normalHand*3 - madPig*13 - joker*20;
     p.final = {pile, normalHand, madPig, joker, total};
   }

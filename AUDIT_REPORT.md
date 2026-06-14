@@ -34,3 +34,11 @@
 - checkRoundEndを整理し、round1はroundEndSummary、round2はfinalRoundSummaryへ分離
 - continueRoundはroundEnd状態でのみ有効
 - node --check と静的チェックを再実施
+
+
+## 追加ルール反映
+- マッド・ピッグ（スペードQ）は手札・得点パイルのどちらにあっても追加 -13点。
+- 得点パイルにある場合、そのカード自身の +1点を通常通り数えたうえで追加 -13点。
+- 警告文、ルールサマリ、最終結果画面に反映。
+- 第1ラウンド結果画面にも暫定得点を表示。
+- makeRoundSnapshotに pileScore / handPenalty / madPigPenalty / jokerPenalty / total を追加。

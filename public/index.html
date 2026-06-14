@@ -33,7 +33,7 @@ h2{margin:0 0 10px}.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.
 .round-card .name{font-weight:900;color:#7a332b}
 .round-card .stat{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed #efd0b4;padding:3px 0;font-size:12px}
 .round-card .stat:last-child{border-bottom:none}
-.round-danger{display:inline-block;margin-top:5px;background:#ffe7ee;border:2px solid #d45c7a;color:#8b1f3b;border-radius:999px;padding:2px 8px;font-size:12px;font-weight:900}
+.round-danger{display:inline-block;margin-top:5px;background:#ffe7ee;border:2px solid #d45c7a;color:#8b1f3b;border-radius:999px;padding:2px 8px;font-size:12px;font-weight:900}.round-total{margin-top:6px;background:#fff3c9;border:2px solid #d4a536;border-radius:12px;padding:6px;text-align:center;font-weight:900;color:#7a4b00}
 .round-actions{margin-top:14px;text-align:center}
 .round-actions .btn{min-width:220px}
 @media(max-width:650px){.round-grid{grid-template-columns:1fr 1fr}.round-panel h2{font-size:22px}.round-actions .btn{width:100%}}.hand-note{margin:0;background:linear-gradient(135deg,#f7ffe9,#eef8d8);border:2px solid #b8d18b;border-radius:14px;padding:10px 12px;color:#36511f;font-weight:900;line-height:1.55;writing-mode:horizontal-tb;text-orientation:mixed;display:block;width:100%;max-width:100%;box-sizing:border-box;white-space:normal}
@@ -235,7 +235,7 @@ h2{margin:0 0 10px}.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.
           <tr><th>項目</th><th>点数</th></tr>
           <tr><td>得点パイル</td><td>+1点 / 1枚</td></tr>
           <tr><td>残った通常手札</td><td>-3点 / 1枚</td></tr>
-          <tr><td>マッド・ピッグ（スペードQ）</td><td>追加 -13点</td></tr>
+          <tr><td>マッド・ピッグ（スペードQ）</td><td>手札・得点パイルのどちらでも追加 -13点 / 1枚<br><small>得点パイルならカード自身の +1点も通常通り数えます</small></td></tr>
           <tr><td>ジョーカー（ババブタ）</td><td>追加 -20点</td></tr>
         </table>
       </div>
@@ -409,13 +409,18 @@ function renderRoundModal(){
       <div class="stat"><span>残り通常手札</span><b>${r.normalHand}枚</b></div>
       <div class="stat"><span>ペア浄化</span><b>${r.pairs}組</b></div>
       <div class="stat"><span>マッド・ピッグ</span><b>${r.madPig}枚</b></div>
+      <div class="stat"><span>得点パイル</span><b>+${r.pileScore ?? r.pile}</b></div>
+      <div class="stat"><span>手札失点</span><b>-${r.handPenalty ?? (r.normalHand*3)}</b></div>
+      <div class="stat"><span>マッド・ピッグ失点</span><b>-${r.madPigPenalty ?? (r.madPig*13)}</b></div>
+      <div class="stat"><span>ババブタ失点</span><b>-${r.jokerPenalty ?? (r.hasJoker?20:0)}</b></div>
+      <div class="round-total">暫定得点：${r.total ?? ((r.pile||0) - (r.normalHand||0)*3 - (r.madPig||0)*13 - (r.hasJoker?20:0))} 点</div>
       ${r.hasJoker?'<span class="round-danger">🃏 ババブタ保持</span>':''}
     </div>
   `).join('');
 
   el.innerHTML = `<div class="round-modal">
     <div class="round-panel">
-      <h2>🐷 第1ラウンド結果</h2>
+      <h2>🐷 第1ラウンド結果</h2><p class="small" style="text-align:center;margin-top:-4px">ここでは第1ラウンド終了時点の暫定得点を表示します。</p>
       <div class="round-reason">${esc(sum.reasonText)}</div>
       <div class="round-grid">${rows}</div>
       <div class="round-actions">
@@ -538,7 +543,7 @@ function renderHand(){
   if(hand.some(isMadPig)){
     alerts.push(`<div class="notice warning">
       <div class="notice-title">☠️ マッド・ピッグ警告</div>
-      <div class="notice-body">スペードQは <strong>マッド・ピッグ</strong>。最終的に持っていると <strong>-13点</strong> の失点になります。</div>
+      <div class="notice-body">スペードQは <strong>マッド・ピッグ</strong>。最終得点計算時に、<strong>手札または得点パイル</strong>にある1枚につき追加で <strong>-13点</strong> になります。得点パイルにある場合、そのカード自身の <strong>+1点</strong> は通常通り数えます。</div>
     </div>`);
   }
   if(state?.phase === 'roundEnd'){
@@ -646,7 +651,7 @@ function renderScore(){
       </div>
       <div class="podium">${podium}</div>
       ${finalReason}<div class="final-comment">${comment}</div>
-      <h3 style="margin:14px 0 6px;color:#b64040">得点内訳</h3>
+      <h3 style="margin:14px 0 6px;color:#b64040">得点内訳</h3><div class="final-comment">マッド・ピッグは得点パイルにあっても追加 -13点です。得点パイルにある場合、そのカード自身の +1点は通常通り数えます。</div>
       <div class="final-breakdown">${breakdown}</div>
       <div class="score-compact">
         <table class="score">
